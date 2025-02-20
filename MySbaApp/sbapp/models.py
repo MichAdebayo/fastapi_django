@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import RegexValidator
 from datetime import datetime, date
 import random
+from phonenumber_field.modelfields import PhoneNumberField 
 
 class LoanRequestUserProfile(AbstractUser):
     """Model representing a loan application"""
@@ -18,6 +19,10 @@ class LoanRequestUserProfile(AbstractUser):
         related_name="loanrequestuserprofile_permissions",
         blank=True
     )
+
+    ### 🔹 Other Contact Information ###
+    address = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = PhoneNumberField(blank=True, null=True)
 
     ### 🔹 Loan Identifier ###
     PREFIX = 1000  # Prefix for LoanNr_ChkDgt
