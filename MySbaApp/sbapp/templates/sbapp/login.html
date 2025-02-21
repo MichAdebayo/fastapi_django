@@ -1,0 +1,56 @@
+{% extends 'sbapp/base.html' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block main_classes %}flex items-center justify-center min-h-screen bg-[#FBFCFA]{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center w-full py-20">
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <!-- Icon at the top -->
+        <div class="flex justify-center mb-6">
+            <div class="w-12 h-12 bg-[#006f4e] rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+        <!-- Title and description -->
+        <h2 class="text-2xl font-bold text-center text-[#006f4e] mb-2">Sign in to your account</h2>
+        
+        <!-- Form -->
+        <form method="post" action="{% url 'login' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="username" class="block text-sm font-medium text-[#006f4e]">Username</label>
+                <input type="text" id="username" name="username" placeholder="Your username"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-[#006f4e]">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center text-sm text-gray-600">
+                    <input type="checkbox" name="remember_me" class="appearance-none h-4 w-4 border border-gray-300 rounded checked:bg-[#006f4e] checked:border-[#006f4e] focus:ring-[#006f4e]">
+                    <span class="ml-2">Remember me</span>
+                </label>
+                <!-- Lien pour réinitialiser le mot de passe -->
+                <a href="{% url 'password_reset' %}" class="text-sm text-[#006f4e] hover:text-[#004d3a]">
+                    Forgot your password?
+                </a>
+            </div>            
+            <button type="submit"
+                class="w-full py-3 bg-[#006f4e] hover:bg-[#009b9d] text-white font-bold rounded-md transition duration-200">
+                Sign in
+            </button>
+        </form>
+        
+        <!-- Sign-up prompt -->
+        <p class="text-center text-sm text-gray-600 mt-6">
+            Don’t have an account? <a href="{% url 'signup' %}" class="text-[#006f4e] hover:text-[#004d3a]">Sign up</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

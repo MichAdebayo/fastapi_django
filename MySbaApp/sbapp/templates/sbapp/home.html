@@ -1,0 +1,311 @@
+{% extends 'sbapp/base.html' %}
+{% load static %}
+
+{% block title %}Home - SBA Inc.{% endblock %}
+
+{% block content %}
+    <!-- Banner Section (Carousel) -->
+    <section class="relative">
+      <div class="carousel-inner relative overflow-hidden">
+        <!-- Slide 1 -->
+        <div class="carousel-item active relative w-full">
+          <div
+            class="flex flex-col items-center justify-center h-96 bg-cover bg-center"
+            style="background-image: url({% static 'images/banner1.png' %});"
+          >
+            <h1 class="text-4xl md:text-6xl font-bold text-white">Grow Your Business</h1>
+            <p class="mt-4 text-lg md:text-xl text-white max-w-xl text-center">
+               Empowering entrepreneurs with tailored loan solutions for sustainable growth.
+            </p>
+            <div class="mt-6 flex space-x-4">
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #3f3d88;">Apply for a Loan Today</a>
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #e93710;">Contact Us</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="carousel-item relative w-full">
+          <div
+            class="flex flex-col items-center justify-center h-96 bg-cover bg-center"
+            style="background-image: url({% static 'images/banner2.png' %});"
+          >
+            <h1 class="text-4xl md:text-6xl font-bold text-white">Learn about upcoming events</h1>
+            <p class="mt-4 text-lg md:text-xl text-white max-w-xl text-center">
+              SBA host monthly training to increase your loan approval chances
+            </p>
+            <div class="mt-6 flex space-x-4">
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #3f3d88;">Join Next Workshop</a>
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #e93710;">Learn More</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="carousel-item relative w-full">
+          <div
+            class="flex flex-col items-center justify-center h-96 bg-cover bg-center"
+            style="background-image: url('{% static 'images/banner3.png' %}');"
+          >
+            <h1 class="text-4xl md:text-6xl font-bold text-white">Grow Your Business</h1>
+            <p class="mt-4 text-lg md:text-xl text-white max-w-xl text-center">
+               Unlock your business potential with SBA's expert financial guidance.
+            </p>
+            <div class="mt-6 flex space-x-4">
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #3f3d88;">Schedule a Free Consultation</a>
+              <a href="#" class="px-4 py-2 text-white rounded" style="background-color: #e93710;">Explore Our Services</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carousel Controls (JS functionality below) -->
+   <button
+      class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-[#3f3d88] text-white text-2xl rounded-full p-3 hover:bg-[#e93710] transition-colors duration-300"
+      id="prev-slide"
+      >
+      <i class="fas fa-angle-left"></i>
+   </button>
+    
+   <button
+      class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#e93710] text-white text-2xl rounded-full p-3 hover:bg-[#e93710] transition-colors duration-300"
+      id="next-slide"
+      >
+      <i class="fas fa-angle-right"></i>
+    </button>
+    
+    </section>
+
+    <!-- About Section -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h2 class="text-3xl font-bold mb-4">About Us</h2>
+          <p class="text-gray-600 mb-6">
+            At SBA, we support Americans in launching, developing, and expanding their businesses. Every day, we work together to champion small businesses, foster entrepreneurial growth in communities nationwide, and drive meaningful outcomes that contribute to their long-term success.
+          </p>
+          <a href="#" class="inline-block px-6 py-2 text-white rounded" style="background-color: #3f3d88;">Read More</a>
+        </div>
+        <div class="md:w-1/2 mt-8 md:mt-0">
+         <img src="{% static 'images/about-img.png' %}" alt="About SBA Inc." class="w-full rounded" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Work Section -->
+    <section class="py-12 bg-white" style="background-image: url('{% static 'images/banner4.png' %}'); background-size: cover; background-position: center;">
+      <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h2 class="text-4xl font-bold mb-4 text-white rounded">Meet Our <br />Awardees</h2>
+          <p class="text-gray-600 mb-6 text-white rounded">
+            Discover the inspiring stories of our award recipients who exemplify excellence and dedication in their fields.
+          </p>
+          <a href="#" class="inline-block px-6 py-2 text-white rounded" style="background-color: #e93710;">See More Videos</a>
+        </div>
+        <div class="md:w-1/2 flex justify-center mt-8 md:mt-0">
+          <div class="relative">
+            <img src="{% static 'images/play-icon.png' %}" alt="Play Video" class="w-16 h-16" />
+          </div>
+        </div>
+      </div>
+    </section>
+    
+
+    <!-- Services Section -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl font-bold">Empowering Your Business Journey</h2>
+          <p class="text-gray-600">
+            Discover the comprehensive support SBA offers to help your business thrive
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="p-6 bg-white rounded shadow">
+            <img src="{% static 'images/phone-icon.png' %}" alt="Social Marketing" class="mx-auto mb-4" />
+            <h3 class="text-xl font-semibold mb-2 text-center">Plan your business</h3>
+            <p class="text-gray-600 text-sm mb-4">You've got a great idea. Now, make a plan to turn it into a great business. We are here to support you.</p>
+            <a href="#" class="block text-center text-white" style="background-color: #e93710;">Read More</a>
+          </div>
+          <div class="p-6 bg-white rounded shadow">
+            <img src="{% static 'images/contant-icon.png' %}" alt="Digital Solutions" class="mx-auto mb-4" />
+            <h3 class="text-xl font-semibold mb-2 text-center">Launch your business</h3>
+            <p class="text-gray-600 text-sm mb-4">Turn your business into a reality. Register, file, and start doing business.
+            </p>
+            <a href="#" class="block text-center text-white" style="background-color: #e93710;">Read More</a>
+          </div>
+          <div class="p-6 bg-white rounded shadow">
+            <img src="{% static 'images/data-icon.png' %}" alt="Data Analytics" class="mx-auto mb-4" />
+            <h3 class="text-xl font-semibold mb-2 text-center">Grow your business</h3>
+            <p class="text-gray-600 text-sm mb-4">When business is good, it's time to expand. Find new funding, locations and customers.</p>
+            <a href="#" class="block text-center text-white" style="background-color: #e93710;">Read More</a>
+          </div>
+          <div class="p-6 bg-white rounded shadow">
+            <img src="{% static 'images/promotion-icon.png' %}" alt="Promotions" class="mx-auto mb-4" />
+            <h3 class="text-xl font-semibold mb-2 text-center">Manage your business</h3>
+            <p class="text-gray-600 text-sm mb-4">Run your business like a boss. Master day-to-day operations and prepare for success.</p>
+            <a href="#" class="block text-center text-white" style="background-color: #e93710;">Read More</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl font-bold">Latest News</h2>
+          <p class="text-gray-600">
+            Find SBA news releases, testimonials and whitepapers, along with a list of our sponsors
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gray-50 p-6 rounded shadow">
+            <h3 class="text-2xl font-semibold mb-4">Empowering Entrepreneurs for Business Sucess Across the Nation</h3>
+            <div class="flex space-x-4 mb-4">
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/like-icon.png' %}" alt="Like" class="w-6 h-6" />
+                <span class="text-sm">Like</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/comment-icon.png' %}" alt="Comment" class="w-6 h-6" />
+                <span class="text-sm">Comment</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/share-icon.png' %}" alt="Share" class="w-6 h-6" />
+                <span class="text-sm">Share</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">
+               The SBA's commitment to small businesses continues as they award 1,800 new loans, helping entrepreneurs overcome financial challenges and fueling economic growth in communities nationwide. 
+            </p>
+            <div class="text-right">
+               <a href="#" class="text-blue-600" style="color: #3f3d88;">Read More</a>
+            </div>
+          </div>
+          <div class="bg-gray-50 p-6 rounded shadow">
+            <h3 class="text-2xl font-semibold mb-4">SBA Launches New Program to Support Minority-Owned Businesses</h3>
+            <div class="flex space-x-4 mb-4">
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/like-icon.png' %}" alt="Like" class="w-6 h-6" />
+                <span class="text-sm">Like</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/comment-icon.png' %}" alt="Comment" class="w-6 h-6" />
+                <span class="text-sm">Comment</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <img src="{% static 'images/share-icon.png' %}" alt="Share" class="w-6 h-6" />
+                <span class="text-sm">Share</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">
+               This initiative is designed to provide targeted funding, mentorship, and resources, ensuring that minority entrepreneurs have the tools they need to thrive and contribute to a more inclusive economy.
+            </p>
+            <div class="text-right">
+               <a href="#" class="text-blue-600" style="color: #3f3d88;">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Customers (Testimonials) Section -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-8">Testimonials</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded shadow">
+            <div class="flex items-center mb-4">
+              <img src="{% static 'images/customer-img.png' %}" alt="Customer" class="w-16 h-16 rounded-full mr-4" />
+              <div>
+                <h3 class="text-xl font-semibold">Nolan Thomas</h3>
+                <p class="text-gray-500">Founder, YogaLife Inc.</p>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm">
+              If"The SBA’s support was a game-changer for my business. From funding opportunities to mentorship, they provided the guidance I needed to scale successfully." – Nolan
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded shadow">
+            <div class="flex items-center mb-4">
+              <img src="{% static 'images/customer-img1.png' %}" alt="Customer" class="w-16 h-16 rounded-full mr-4" />
+              <div>
+                <h3 class="text-xl font-semibold">Ryers Morgan</h3>
+                <p class="text-gray-500">CEO, Techtalk</p>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm">
+               "SBA’s commitment to small businesses is unmatched. The training sessions and networking opportunities helped me refine my business strategy and achieve sustainable growth." – Ryers
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-8">Contact us for any inquiries</h2>
+        <div class="max-w-xl mx-auto">
+          <form class="space-y-4">
+            <input
+              type="text"
+              class="w-full px-4 py-2 border rounded"
+              placeholder="Full Name"
+              name="Full Name"
+            />
+            <input
+              type="email"
+              class="w-full px-4 py-2 border rounded"
+              placeholder="Email"
+              name="Email"
+            />
+            <input
+              type="text"
+              class="w-full px-4 py-2 border rounded"
+              placeholder="Phone Number"
+              name="Phone Number"
+            />
+            <textarea
+              class="w-full px-4 py-2 border rounded"
+              placeholder="Message"
+              rows="5"
+              name="Message"
+            ></textarea>
+            <button type="submit" class="w-full px-4 py-2 text-white rounded" style="background-color: #3f3d88;">
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scripts -->
+    <script>
+      // Basic Carousel Functionality
+      let slideIndex = 0;
+      const slides = document.querySelectorAll('.carousel-item');
+      const showSlide = (index) => {
+          slides.forEach((slide, i) => {
+          slide.style.display = i === index ? 'block' : 'none';
+          });
+      };
+      showSlide(slideIndex);
+      document.getElementById('prev-slide').addEventListener('click', () => {
+          slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+          showSlide(slideIndex);
+      });
+      document.getElementById('next-slide').addEventListener('click', () => {
+          slideIndex = (slideIndex + 1) % slides.length;
+          showSlide(slideIndex);
+      });
+      // Optional auto-slide every 5 seconds
+      setInterval(() => {
+          slideIndex = (slideIndex + 1) % slides.length;
+          showSlide(slideIndex);
+      }, 5000);
+    </script>
+
+{% endblock %}
+
