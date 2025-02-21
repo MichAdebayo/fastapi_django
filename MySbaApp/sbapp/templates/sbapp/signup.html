@@ -1,0 +1,57 @@
+{% extends 'sbapp/base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block main_classes %}flex items-center justify-center min-h-screen bg-[#FBFCFA]{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center w-full py-10">
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <!-- Icon at the top -->
+        <div class="flex justify-center mb-6">
+            <div class="w-12 h-12 bg-[#3f3d88] rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>                
+            </div>
+        </div>
+        <!-- Title and description -->
+        <h2 class="text-2xl font-bold text-center text-[#3f3d88] mb-2">Create your account</h2>
+        <p class="text-center text-gray-500 mb-6">Join the Simplon SBA train</p>
+        
+        <!-- Form -->
+        <form method="post" action="{% url 'signup' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="username" class="block text-sm font-medium text-[#3f3d88]">Username</label>
+                <input type="text" id="username" name="username" placeholder="Your username"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-[#3f3d88]">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-[#3f3d88]">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <div>
+                <label for="confirm_password" class="block text-sm font-medium text-[#3f3d88]">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••"
+                    class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-[#006f4e] focus:border-[#006f4e] text-sm" required>
+            </div>
+            <button type="submit"
+                class="w-full py-3 bg-[#3f3d88] hover:bg-[#e93710] text-white font-bold rounded-md transition duration-200">
+                Sign Up
+            </button>
+        </form>
+        
+        <!-- Login prompt -->
+        <p class="text-center text-sm text-gray-600 mt-6">
+            Already have an account? <a href="{% url 'login' %}" class="text-[#3f3d88] hover:text-[#e93710]">Sign in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
