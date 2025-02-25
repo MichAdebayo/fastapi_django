@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 #             obj.set_password(obj.password)
 #         super().save_model(request, obj, form, change)
 
-# class LoanRequestUserProfileAdmin(admin.ModelAdmin):
+# class LoanRequestAdmin(admin.ModelAdmin):
 #     readonly_fields = ('LoanNr_ChkDgt',)  # Prevent manual input
 
 # # Unregister the default UserAdmin and register the custom one

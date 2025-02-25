@@ -1,28 +1,33 @@
 from django.shortcuts import redirect #, render
-# # from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView #, PasswordChangeView
-# # from django.views.generic.edit import CreateView, UpdateView
-# # from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import LoginView
+from django.views.generic.edit import CreateView, UpdateView
+from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView
-from .models import LoanRequest, UserProfile #, Job, ContactMessage, PredictionHistory, Appointment,Availability
-from .forms import UserProfileForm, UserSignupForm #, ApplicationForm, ChangePasswordForm, PredictChargesForm, AppointmentForm
+from django.views.generic import TemplateView, CreateView, UpdateView, ListView, FormView, DetailView
+from .models import UserProfile, LoanRequest #, Job, ContactMessage, PredictionHistory, Appointment,Availability, 
+from .forms import UserSignupForm, UserProfileForm, LoanRequestForm #, ApplicationForm, ChangePasswordForm, PredictChargesForm, AppointmentForm
 # from django.http import HttpResponse
-# import pickle
+import random
 # from django.http import JsonResponse
 # import json
 # from django.views.decorators.csrf import csrf_exempt
-# from django.contrib.auth import logout, get_user_model
+from django.contrib.auth import get_user_model, login #logout, 
 # from django.conf import settings
 # from django.views import View 
 # import pandas as pd
 # import os
 # from django.contrib.admin.views.decorators import staff_member_required
-# from django.views.generic import ListView
 # from django.db.models import Avg
 # from django.contrib.auth.decorators import login_required
 # from django.utils import timezone
+import requests
+import logging
+from django.contrib.auth.forms import AuthenticationForm
 
+
+logger = logging.getLogger(__name__)
 
 class HomeView(TemplateView):
 
@@ -34,23 +39,18 @@ class SignupView(CreateView):
     model = UserProfile
     form_class = UserSignupForm
     template_name = 'sbapp/signup.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('login')
 
 
-class CustomLoginView(LoginView):
+class UserLoginView(LoginView):
 
     template_name = 'sbapp/login.html'
+    authentication_form = AuthenticationForm
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('home')
-
-    def dispatch(self, request, *args, **kwargs):
-
-        if self.request.user.is_authenticated:
-            return redirect('home')
-        return super().dispatch(request, *args, **kwargs)
-
+        return reverse_lazy('user_welcome')
+    
     def form_valid(self, form):
 
         remember_me = self.request.POST.get('remember_me', None) is not None
@@ -62,23 +62,233 @@ class CustomLoginView(LoginView):
 
         return super().form_valid(form)
 
-# class TestingView(TemplateView):
+
+class UserWelcomeView(LoginRequiredMixin, TemplateView):
+    """
+    A view to display the user's welcome dashboard.
+    
+    This page provides an overview of the user's loan applications, 
+    account information, and important updates.
+    
+    Features:
+        - Displays loan application history
+        - Shows application status updates
+        - Provides access to loan requests and resources
+    """
+    template_name = 'sbapp/user_welcome.html'
+
+    # def get_context_data(self, **kwargs):
+    #     """
+    #     Adds loan application history and relevant user info to the context.
+    #     """
+    #     context = super().get_context_data(**kwargs)
+        
+        # Fetching the user's loan applications
+        # context['loan_applications'] = LoanRequest.objects.filter(username=self.request.user).order_by('-approval_date')
+        
+        # # Example notifications or messages (could be extended from a model)
+        # context['notifications'] = [
+        #     "Your latest loan request is under review.",
+        #     "Don't forget to check out our business resources!",
+        # ]
+
+        # print(LoanRequest.objects.filter(username=self.request.user).exists())
+
+        # return context
+    
+class UserProfileView(LoginRequiredMixin, UpdateView):
+
+    model = get_user_model()
+    form_class = UserProfileForm
+    template_name = 'sbapp/user_profile.html'
+    success_url = reverse_lazy('user_profile') 
+
+    def get_object(self, queryset=None):
+        return self.request.user
+    
+    def form_valid(self, form):
+        # Explicitly save the form
+        user = form.save(commit=False)  # Get the user object without saving it yet
+        user.save()
+        messages.success(self.request, 'Your profile has been updated successfully!')
+        return super().form_valid(form)  # Proceed with the normal response
+    
+    def form_invalid(self, form):
+        """Handles invalid form submissions and provides error messages."""
+        messages.error(self.request, 'There was an error updating your profile. Please try again.')
+        return super().form_invalid(form)
+
+class LoanRequestCreateView(LoginRequiredMixin, CreateView):
+    model = LoanRequest
+    form_class = LoanRequestForm
+    template_name = 'sbapp/user_loan_request.html'
+    success_url = reverse_lazy('user_loan_request_success') # Redirect after successful form submission
+
+    def form_valid(self, form):
+        form.instance.username = self.request.user  # Assign the logged-in user
+        return super().form_valid(form)
+    
+    # def form_valid(self, form):
+    #     # Associate loan with logged-in user
+    #     form.instance.username = self.request.user
+        
+    #     # Convert gr_appv to currency format
+    #     amount = form.cleaned_data.get('gr_appv')
+    #     if amount is not None:
+    #         form.instance.gr_appv = f"${amount:,.2f}"
+    #     response = super().form_valid(form)
+    #     messages.success(self.request, 'Loan request submitted successfully!')
+    #     return response
+
+class LoanRequestSuccessView(TemplateView):
+    template_name = 'sbapp/user_loan_request_success.html'
+
+class LoanRequestStatusView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+    template_name = "sbapp/user_loan_status.html"  # Render status page directly
+    form_class = LoanRequestForm
+    success_message = "Your loan request has been submitted successfully."
+
+    def form_valid(self, form):
+        """
+        Saves the loan request and passes its details to the template.
+        """
+        loan_request = form.save(commit=False)
+        loan_request.user = self.request.user  # Assign the logged-in user
+        loan_request.status = "Pending"  # Default status
+        loan_request.save()
+
+        # Pass loan request details to the template
+        context = self.get_context_data(form=form)
+        context.update({
+            'loan_request_id': loan_request.id,
+            'loan_amount': loan_request.gr_appv,  # Adjust field name if needed
+            'loan_status': loan_request.loan_status,
+        })
+        return self.render_to_response(context)
+
+
+# class LoanStatusView(LoginRequiredMixin, TemplateView):
 #     """
-#     Renders the testing page.
+#     A view to check the status of a user's loan applications.
 
-#     This view is responsible for rendering the 'base_final.html' template, likely used 
-#     for testing purposes or as part of the home page layout.
-
-#     Attributes:
-#         template_name (str): The name of the template used to display the response.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse: Renders the 'base_final.html' template.
+#     Displays the submitted applications and their current approval status.
+    
+#     Features:
+#         - Shows pending, approved, and rejected applications
+#         - Displays approval dates and financial details
 #     """
-#     template_name = 'insurance_app/base_final.html'  # Home Page View Template
+#     template_name = "sbapp/user_loan_status.html"
+
+#     def get_context_data(self, **kwargs):
+#         """
+#         Fetches loan applications and adds them to the context.
+#         """
+#         context = super().get_context_data(**kwargs)
+#         user = self.request.user
+
+#         # Retrieve all loan applications for the logged-in user
+#         context['loan_applications'] = LoanRequest.objects.filter(user=user).order_by('-approval_date')
+
+#         return context
+    
+
+class BusinessResourcesView(LoginRequiredMixin, TemplateView):
+    """
+    A view providing users with business resources and guides.
+
+    Features:
+        - Displays loan application guides
+        - Provides financial planning tools
+        - Links to helpful external resources
+    """
+    template_name = "sbapp/business_resources.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds business resources to the context.
+        """
+        context = super().get_context_data(**kwargs)
+
+        # Example resources (could be fetched from a database model)
+        context['resources'] = [
+            {"title": "How to Improve Your Loan Approval Chances", "link": "#"},
+            {"title": "Financial Planning for Small Businesses", "link": "#"},
+            {"title": "Understanding SBA Loan Programs", "link": "#"},
+            {"title": "How to Build Business Credit", "link": "#"},
+        ]
+
+        return context
+
+
+class WorkshopsView(TemplateView):
+    template_name = 'workshops.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Example of data coming from a Python structure like a list of dictionaries
+        context['workshops'] = [
+            {'title': 'Introduction to Django', 'date': '2025-02-28', 'location': 'Online', 'description': 'Learn the basics of a successful loan request.'},
+            {'title': 'Advanced Python Techniques', 'date': '2025-03-15', 'location': 'New York', 'description': 'Explore the different grants available.'},
+            {'title': 'AI & ML Workshop', 'date': '2025-04-01', 'location': 'London', 'description': 'Leveraging AI and Machine Learning for successful loan application.'}
+        ]
+        return context
+
+
+
+
+# class UserLoginView(LoginView):
+#     template_name = 'sbapp/login.html'
+#     authentication_form = AuthenticationForm
+#     redirect_authenticated_user = True
+
+#     def get_success_url(self):
+#         logger.debug(f"Login successful for user: {self.request.user}")
+#         return reverse_lazy('home')
+    
+#     def dispatch(self, request, *args, **kwargs):
+#         if self.request.user.is_authenticated:
+#             return redirect('home')
+#         return super().dispatch(request, *args, **kwargs)
+    
+#     def form_invalid(self, form):
+#         logger.warning(f"Login failed: {form.errors}")
+#         return super().form_invalid(form)
+
+#     def form_valid(self, form):
+#         remember_me = self.request.POST.get('remember_me', None) is not None
+
+#         if not remember_me:
+#             self.request.session.set_expiry(0)  # Expire session on browser close
+#         else:
+#             self.request.session.set_expiry(1209600)  # Session lasts 2 weeks
+
+#         return super().form_valid(form)
+        
+            # remember_me = self.request.POST.get('remember_me', None) is not None
+
+            # if not remember_me:
+            #     self.request.session.set_expiry(0)  # Expire session on browser close
+            # else:
+            #     self.request.session.set_expiry(1209600)  # Session lasts 2 weeks
+
+            # # Add the API call here (FastAPI login verification)
+            # fastapi_url = "http://localhost:8000/auth/login"  # URL for the FastAPI login endpoint
+            # payload = {
+            #     'email': form.cleaned_data['email'],
+            #     'password': form.cleaned_data['password']
+            # }
+
+            # # Send a POST request to FastAPI
+            # response = requests.post(fastapi_url, json=payload)
+
+            # if response.status_code == 200 and response.json().get('authenticated'):
+            #     # Handle successful login
+            #     return super().form_valid(form)
+            
+            # # Handle failed login (maybe display an error message)
+            # form.add_error(None, "Invalid credentials or FastAPI verification failed.")
+            # return self.form_invalid(form)
 
 
          
@@ -505,64 +715,7 @@ class CustomLoginView(LoginView):
 
 
 
-# class UserProfileView(LoginRequiredMixin, UpdateView):
-#     """
-#     A view for authenticated users to update their own profile information.
 
-#     This class-based view handles user profile updates by combining Django's
-#     LoginRequiredMixin with UpdateView functionality. It ensures only authenticated
-#     users can access the profile edit page and automatically handles form validation
-#     and saving.
-
-#     Attributes:
-#         model (User): The user model instance being edited (uses get_user_model()
-#             for custom user model compatibility)
-#         form_class (UserProfileForm): The form class used for profile updates
-#         template_name (str): Path to the profile editing template
-#         success_url (str): URL to redirect to after successful update
-
-#     Methods:
-#         get_object: Retrieves the current user's profile for editing
-#         form_valid: Handles successful form submissions and adds user feedback
-
-#     Features:
-#         - Requires authentication through LoginRequiredMixin
-#         - Pre-populates form with current user data
-#         - Displays success messages using Django's messages framework
-#         - Automatic redirect to profile page after update
-#     """
-
-#     model = get_user_model()
-#     form_class = UserProfileForm
-#     template_name = 'insurance_app/profile.html'
-#     success_url = reverse_lazy('profile')
-
-#     def get_object(self, queryset=None):
-#         """Retrieve the current logged-in user instance for editing.
-        
-#         Overrides default UpdateView behavior to automatically use the
-#         request's user without needing a URL parameter.
-        
-#         Args:
-#             queryset: Optional queryset (not used in this implementation)
-            
-#         Returns:
-#             User: The currently authenticated user instance
-#         """
-#         return self.request.user
-    
-#     def form_valid(self, form):
-#         """Handle valid form submission and provide user feedback.
-        
-#         Args:
-#             form: Validated UserProfileForm instance
-            
-#         Returns:
-#             HttpResponseRedirect: Redirect to success_url
-#         """
-#         response = super().form_valid(form)
-#         messages.success(self.request, 'Your profile has been updated!')
-#         return response
 
 
 # class ChangePasswordView(PasswordChangeView):

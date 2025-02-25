@@ -1,0 +1,96 @@
+{% extends 'sbapp/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Admin Welcome Section -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ user.username }}</h1>
+        <p class="text-lg text-gray-600">You can manage loan applications and determine their approval status.</p>
+    </div>
+
+    <!-- Loan Application Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-blue-100 p-4 rounded-lg shadow-md">
+            <h2 class="font-semibold text-xl">Pending Loans</h2>
+            <p class="text-2xl font-bold text-blue-600">{{ pending_loans_count }}</p>
+        </div>
+        <div class="bg-green-100 p-4 rounded-lg shadow-md">
+            <h2 class="font-semibold text-xl">Approved Loans</h2>
+            <p class="text-2xl font-bold text-green-600">{{ approved_loans_count }}</p>
+        </div>
+        <div class="bg-red-100 p-4 rounded-lg shadow-md">
+            <h2 class="font-semibold text-xl">Rejected Loans</h2>
+            <p class="text-2xl font-bold text-red-600">{{ rejected_loans_count }}</p>
+        </div>
+    </div>
+
+    <!-- Loan Applications Table -->
+    <div class="overflow-hidden bg-white shadow-md rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-500">Applicant Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-500">Loan Amount</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-500">Application Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for application in loan_applications %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ application.applicant_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ application.loan_amount }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ application.status_color }}">{{ application.status }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-800" onclick="determineApproval('{{ application.id }}')">Determine Approval</button>
+                        <button class="ml-2 text-green-600 hover:text-green-800" onclick="approveLoan('{{ application.id }}')">Approve</button>
+                        <button class="ml-2 text-red-600 hover:text-red-800" onclick="rejectLoan('{{ application.id }}')">Reject</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // JavaScript to call the FastAPI and determine loan approval
+    async function determineApproval(applicationId) {
+        const response = await fetch(`/determine-approval/${applicationId}/`, {
+            method: 'GET',
+        });
+        const data = await response.json();
+        alert(`Loan Status: ${data.status}`);
+        // Optionally refresh the page or update status in the table dynamically
+    }
+
+    async function approveLoan(applicationId) {
+        // Logic to approve loan
+        const response = await fetch(`/approve-loan/${applicationId}/`, {
+            method: 'POST',
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert("Loan Approved!");
+            // Optionally update the loan status on the page
+        }
+    }
+
+    async function rejectLoan(applicationId) {
+        // Logic to reject loan
+        const response = await fetch(`/reject-loan/${applicationId}/`, {
+            method: 'POST',
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert("Loan Rejected!");
+            // Optionally update the loan status on the page
+        }
+    }
+</script>
+
+{% endblock %}

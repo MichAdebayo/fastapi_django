@@ -31,11 +31,19 @@
           <a href="{% url 'contact' %}" class="block text-gray-700 hover:text-blue-600">Contact Us</a> {% endcomment %}
         </nav>
         <div class="flex items-center space-x-4">
-          <a href="#" class="text-gray-700 hover:text-blue-600">
+          <a href="#" class="text-white hover:text-[#e93710]">
             <i class="fas fa-search"></i>
           </a>
-          <a href="#" class="text-gray-700 hover:text-blue-600">
+          <a href="#" class="text-white hover:text-[#e93710]" id="user-icon">
             <i class="fas fa-user"></i>
+          </a>
+          
+          <!-- Dropdown Menu -->
+          <div id="dropdown-menu" class="hidden bg-gray-800 text-white rounded shadow-md mt-2 absolute">
+            <a href="#" class="block px-4 py-2 hover:bg-[#e93710]">client</a>
+            <a href="#" class="block px-4 py-2 hover:bg-[#e93710]">admin</a>
+          </div>
+          
           </a>
           <!-- Mobile menu button -->
           <button
@@ -168,6 +176,20 @@
             mobileMenu.style.display =
             mobileMenu.style.display === 'block' ? 'none' : 'block';
         });
+
+        const userIcon = document.getElementById('user-icon');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        // Toggle dropdown visibility
+        userIcon.addEventListener('click', (event) => {
+          event.preventDefault();
+          dropdownMenu.classList.toggle('hidden');
+        });
+
+        // Close dropdown if clicking outside of it
+        document.addEventListener('click', (event) => {
+          if (!userIcon.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
         </script>
     </body>
 </html>
