@@ -16,6 +16,10 @@ class UserSignupForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ["username", "email", "password"]  # Fields displayed in the form
+        #fields = [
+        #    "first_name", 'last_name', 'username', 'email', 'address', 'phone_number'
+        #]
+
 
     def save(self, commit=True):
         user = super().save(
@@ -31,35 +35,34 @@ class UserSignupForm(forms.ModelForm):
 
 class UserLoginForm(forms.Form):
 
-    email = forms.CharField(
-        max_length=150, label="Email"
+    username = forms.CharField(
+        max_length=150, label="Username"
     )  # Field for the username
     password = forms.CharField(
         widget=forms.PasswordInput, label="Password"
     )  # Password field with hidden input
-
 
 class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
         fields = [
-            "first_name", 'last_name', 'username', 'email', 'address', 'phone_number'
+            'username', 'first_name', 'last_name', 'email', 'address', 'phone_number',
         ]
 
 class LoanRequestForm(forms.ModelForm):
-
     class Meta:
         model = LoanRequest
-        fields = [
-            'name', 'city', 'state', 'zip', 'bank',
-            'bank_state', 'naics', 'approval_date', 'approval_fy', 'term',
-            'no_emp', 'new_exist', 'create_job', 'retained_job', 'franchise_code',
-            'urban_rural', 'rev_line_cr', 'low_doc', 'chg_off_date', 'disbursement_date', 
-            'disbursement_gross', 'balance_gross', 'chg_off_prin_gr', 'gr_appv', 'sba_appv',
+        fields = [ 'name',
+            # 'name', 'city', 'state', 'zip', 'bank',
+            # 'bank_state', 'naics', 'term','no_emp', 'new_exist',
+            #  'create_job', 'retained_job', 'franchise_code',
+            # 'urban_rural', 'rev_line_cr', 'low_doc', 'gr_appv', 
         ]
 
-
+        # widgets = {
+        #     'gr_appv': forms.NumberInput(attrs={'step': '0.01'}),
+        # }
 # class ApprovalSimulationForm(forms.ModelForm):
  
 #     class Meta:

@@ -1,0 +1,75 @@
+{% extends 'sbapp/base.html' %}
+
+{% load static %}
+
+{% block title %}Welcome - SBA Inc.{% endblock %}
+
+{% block content %}
+<!-- Personalized Banner Section -->
+<section class="relative bg-cover bg-center" style="background-image: url('{% static 'images/banner-user.png' %}');">
+  <div class="flex flex-col items-center justify-center h-96 bg-black bg-opacity-50">
+    <h1 class="text-4xl md:text-6xl font-bold text-white">Welcome back, {{ user.username }}!</h1>
+    <p class="mt-4 text-lg md:text-xl text-white max-w-xl text-center">
+      We're here to help you grow your business with tailored loan solutions and expert support.
+    </p>
+  </div>
+</section>
+
+<!-- User Dashboard Section -->
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold mb-6 text-center" style="color: #3f3d88;">Your Dashboard</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Update Profile -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-user text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">Update Profile</h3>
+        <p class="text-gray-600 mb-4">Update your personal information and business details.</p>
+        <a href="{% url 'user_profile' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Update Profile</a>
+      </div>
+
+      <!-- Loan Request -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-dollar-sign text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">Make a Loan Request</h3>
+        <p class="text-gray-600 mb-4">Request financing for your business expansion or project.</p>
+        <a href="{% url 'user_loan_request' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Request Loan</a>
+      </div>
+
+      <!-- View Loan Status -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-check-circle text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">View Loan Status</h3>
+        <p class="text-gray-600 mb-4">Check the current status of your loan applications.</p>
+        <a href="{% url 'user_loan_status' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Check Status</a>
+      </div>
+
+      <!-- Business Resources -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-book text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">Business Resources</h3>
+        <p class="text-gray-600 mb-4">Explore tools and resources to help grow your business.</p>
+        <a href="{% url 'business_resources' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Explore Resources</a>
+      </div>
+
+      <!-- Workshops and Events -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-chalkboard-teacher text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">Workshops & Events</h3>
+        <p class="text-gray-600 mb-4">Sign up for upcoming workshops to increase your loan approval chances.</p>
+        <a href="{% url 'workshops' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Join Workshop</a>
+      </div>
+
+      <!-- Contact Support -->
+      <div class="p-6 bg-white rounded shadow text-center">
+        <i class="fa fa-headset text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+        <h3 class="text-xl font-semibold mb-2">Contact Support</h3>
+        <p class="text-gray-600 mb-4">Need assistance? Get in touch with our support team.</p>
+        <a href="{% url 'contact_support' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

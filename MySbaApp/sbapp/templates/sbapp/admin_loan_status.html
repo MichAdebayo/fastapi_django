@@ -1,0 +1,54 @@
+{% extends 'sbapp/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Loan Status</h1>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700 uppercase text-sm">
+                    <th class="py-2 px-4 border">Loan ID</th>
+                    <th class="py-2 px-4 border">Approval Status</th>
+                    <th class="py-2 px-4 border">Approval Date</th>
+                    <th class="py-2 px-4 border">Disbursement Date</th>
+                    <th class="py-2 px-4 border">Amount Approved</th>
+                    <th class="py-2 px-4 border">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loan_requests %}
+                <tr class="border-b text-gray-800">
+                    <td class="py-2 px-4 border">{{ loan.id }}</td>
+                    <td class="py-2 px-4 border">
+                        {% if loan.approval_status == 'Approved' %}
+                            <span class="text-green-600 font-bold">Approved</span>
+                        {% elif loan.approval_status == 'Rejected' %}
+                            <span class="text-red-600 font-bold">Rejected</span>
+                        {% else %}
+                            <span class="text-yellow-500 font-bold">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-2 px-4 border">{{ loan.approval_date|default:"-" }}</td>
+                    <td class="py-2 px-4 border">{{ loan.disbursement_date|default:"-" }}</td>
+                    <td class="py-2 px-4 border">${{ loan.sba_appv|floatformat:2 }}</td>
+                    <td class="py-2 px-4 border">
+                        {% if loan.approval_status == 'Pending' %}
+                            <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                Check Status
+                            </button>
+                        {% else %}
+                            <span class="text-gray-600">No Action</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-gray-500">No loan applications found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
