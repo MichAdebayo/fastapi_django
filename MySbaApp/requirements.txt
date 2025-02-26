@@ -1,0 +1,8 @@
+Django==5.1.6
+django-browser-reload==1.18.0
+django-phonenumber-field[phonenumberslite]
+django-tailwind==3.8.0
+dotenv==0.9.9
+numpy==2.2.3
+pandas==2.2.3
+requests==2.32.3

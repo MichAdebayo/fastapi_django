@@ -140,6 +140,18 @@ class LoanRequestCreateView(LoginRequiredMixin, CreateView):
 class LoanRequestSuccessView(TemplateView):
     template_name = 'sbapp/user_loan_request_success.html'
 
+    # def post(self, request, *args, **kwargs):
+    #     # Si la requête est de type POST, on peut récupérer les données envoyées
+    #     param = request.POST.get('mon_parametre', 'valeur_par_defaut')
+
+    #     # Effectuez ici le traitement souhaité, par exemple enregistrer des informations, etc.
+    #     print(f'Paramètre reçu: {param}')
+
+    #     # Redirigez ou retournez une réponse après traitement
+    #     return HttpResponse("Traitement effectué avec succès.")
+    
+    # # Vous pouvez également implémenter la méthode get si vous avez besoin de gérer l
+
 class LoanRequestStatusView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     template_name = "sbapp/user_loan_status.html"  # Render status page directly
     form_class = LoanRequestForm
@@ -209,6 +221,9 @@ class WorkshopsView(TemplateView):
             }
         ]
         return context
+    
+class LoanRequestListView(ListView) : 
+    template_name = 'sbapp/admin_loan_request.html'
     
 
 # class LoanStatusView(LoginRequiredMixin, TemplateView):
