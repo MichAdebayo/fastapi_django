@@ -125,12 +125,9 @@ class LoanRequestCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('user_loan_request_success') # Redirect after successful form submission
 
     def form_valid(self, form):
-        form.instance.username = self.request.user  # Assign the logged-in user
+        form.instance.user = self.request.user  # Assign the logged-in user
         return super().form_valid(form)
-    
-    # def form_valid(self, form):
-    #     # Associate loan with logged-in user
-    #     form.instance.username = self.request.user
+
         
     #     # Convert gr_appv to currency format
     #     amount = form.cleaned_data.get('gr_appv')
@@ -166,6 +163,53 @@ class LoanRequestStatusView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         })
         return self.render_to_response(context)
 
+class AboutView(TemplateView):
+    template_name = 'sbapp/about.html'  # About Us View Template
+
+class ServicesView(TemplateView):
+    template_name = 'sbapp/services.html'  # Services View Template
+
+class BlogView(TemplateView):
+    template_name = 'sbapp/blog.html'  # Blog View Template
+
+class TestimonialView(TemplateView):
+    template_name = 'sbapp/testimonial.html'  # Testimonial View Template
+
+class ContactView(TemplateView):
+    template_name = 'sbapp/contact.html'  # Contact View Template
+
+class ContactSupportView(TemplateView):
+    template_name = 'sbapp/contact_support.html'  # User Contact View Template
+
+from django.views.generic import TemplateView
+
+class WorkshopsView(TemplateView):
+    template_name = 'sbapp/workshops.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['workshops'] = [
+            {
+                'title': 'Introduction to Django', 
+                'date': '2025-02-28', 
+                'location': 'Online', 
+                'description': 'Learn the basics of a successful loan request.'
+            },
+            {
+                'title': 'Different Grant Types', 
+                'date': '2025-03-15', 
+                'location': 'New York', 
+                'description': 'Explore the different grants available.'
+            },
+            {
+                'title': 'AI & ML Workshop', 
+                'date': '2025-04-01', 
+                'location': 'London', 
+                'description': 'Leveraging AI and Machine Learning for successful loan application.'
+            }
+        ]
+        return context
+    
 
 # class LoanStatusView(LoginRequiredMixin, TemplateView):
 #     """
@@ -220,19 +264,25 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class WorkshopsView(TemplateView):
-    template_name = 'workshops.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
 
-        # Example of data coming from a Python structure like a list of dictionaries
-        context['workshops'] = [
-            {'title': 'Introduction to Django', 'date': '2025-02-28', 'location': 'Online', 'description': 'Learn the basics of a successful loan request.'},
-            {'title': 'Advanced Python Techniques', 'date': '2025-03-15', 'location': 'New York', 'description': 'Explore the different grants available.'},
-            {'title': 'AI & ML Workshop', 'date': '2025-04-01', 'location': 'London', 'description': 'Leveraging AI and Machine Learning for successful loan application.'}
-        ]
-        return context
+# To handle client messages submission
+# def contact_view_user(request):
+#     if request.method == "POST":
+#         name = request.POST.get("name")
+#         email = request.POST.get("email")
+#         message = request.POST.get("message")
+
+#         # Save the message to the database
+#         ContactMessage.objects.create(name=name, email=email, message=message)
+
+#         # Show a success message
+#         messages.success(request, "Your message has been sent successfully!")
+#         return redirect('contact_form')  # Replace 'contact' with the name of your URL pattern
+
+#     return render(request, "insurance_app/contact_form_user.html")
+
+
 
 
 
@@ -290,123 +340,6 @@ class WorkshopsView(TemplateView):
             # form.add_error(None, "Invalid credentials or FastAPI verification failed.")
             # return self.form_invalid(form)
 
-
-         
-# class AboutView(TemplateView):
-#     """
-#     Renders the 'About Us' page.
-
-#     This view is responsible for rendering the 'about.html' template, which provides 
-#     information about the application. 
-
-#     Attributes:
-#         template_name (str): The name of the template used to display the response.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse: Renders the 'about.html' template.
-#     """
-#     template_name = 'insurance_app/about.html'  # About Us View Template
-
-
-# class JoinUsView(TemplateView):
-#     """
-#     Displays the 'Join Us' page with a list of job openings.
-
-#     This view retrieves all available job listings from the database and renders them 
-#     in the 'join_us.html' template. The jobs are passed to the template context for display.
-
-#     Attributes:
-#         template_name (str): The name of the template used to display the response.
-
-#     Methods:
-#         get_context_data(**kwargs):
-#             Retrieves the job listings from the database and adds them to the context 
-#             for rendering in the template.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-#         **kwargs: Additional keyword arguments passed to the context.
-
-#     Returns:
-#         dict: The context dictionary containing the list of job openings.
-#     """
-#     template_name = 'insurance_app/join_us.html'  # Join Us View Template
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['jobs'] = Job.objects.all()
-#         return context
-
-
-
-# class ApplyView(TemplateView):
-#     """
-#     Handles job application submissions and displays a thank-you page.
-
-#     This view renders a template for submitting job applications and processes form submissions 
-#     via POST requests. If the submitted form is valid, the application is saved, and the user 
-#     is redirected to a thank-you page.
-
-#     Attributes:
-#         template_name (str): The name of the template used to display the response.
-
-#     Methods:
-#         post(request, *args, **kwargs):
-#             Processes the application form submission. If valid, saves the data and redirects 
-#             to the 'apply_thank_you' page. Otherwise, re-renders the form with errors.
-    
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse:
-#             - If POST and form is valid: Redirects to the 'apply_thank_you' page.
-#             - If POST and form is invalid: Renders the form with errors.
-#     """
-#     template_name = 'apply_thank_you.html'
-
-#     def post(self, request, *args, **kwargs):
-#         # Handle form submission here
-#         if request.method == 'POST':
-#             form = ApplicationForm(request.POST, request.FILES)
-#             if form.is_valid():
-#                 # Process the form (e.g., save data, send email, etc.)
-#                 form.save()  # Save the application in our model 
-#                 return redirect('apply_thank_you')  # Redirect to a thank you page
-#         else:
-#             form = ApplicationForm()
-
-#         return render(request, self.template_name, {'form': form})
-
-
-# def apply(request):
-#     """
-#     Handles job application submissions.
-
-#     This view processes POST requests to collect applicant details, including name, email, 
-#     job ID, and resume. If the form is submitted successfully, a confirmation message is 
-#     displayed. If the request method is not POST, the user is redirected to the 'join_us' page.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse:
-#             - If POST: Returns a success message confirming the application submission.
-#             - If GET or other methods: Redirects to the 'join_us' page.
-#     """
-#     if request.method == "POST":
-#         name = request.POST.get('name')
-#         email = request.POST.get('email')
-#         job_id = request.POST.get('job_id')
-#         resume = request.FILES.get('resume')
-
-#         return HttpResponse("Application submitted successfully!")
-    
-#     return redirect('join_us')
 
 
 # class HealthAdvicesView(TemplateView):
@@ -466,36 +399,7 @@ class WorkshopsView(TemplateView):
 #     return render(request, "insurance_app/contact_form.html")
 
 
-# # To handle client messages submission
-# def contact_view_user(request):
-#     """
-#     Handles the contact form submission and displays the contact form for loggedin users.
 
-#     This view processes POST requests to capture user input (name, email, and message),
-#     saves the message in the database, and displays a success message before redirecting 
-#     the user back to the contact page. For GET requests, it renders the contact form.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse:
-#             - If POST: Redirects to the contact page after saving the message.
-#             - If GET: Renders the 'contact_form.html' template.
-#     """
-#     if request.method == "POST":
-#         name = request.POST.get("name")
-#         email = request.POST.get("email")
-#         message = request.POST.get("message")
-
-#         # Save the message to the database
-#         ContactMessage.objects.create(name=name, email=email, message=message)
-
-#         # Show a success message
-#         messages.success(request, "Your message has been sent successfully!")
-#         return redirect('contact_form')  # Replace 'contact' with the name of your URL pattern
-
-#     return render(request, "insurance_app/contact_form_user.html")
 
 # @staff_member_required
 # def message_list_view(request):
