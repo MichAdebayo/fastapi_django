@@ -19,17 +19,6 @@
     <div class="space-y-4">
         <!-- Two-column grid for form fields -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Enterprise Name -->
-            <div class="flex flex-col">
-                <label for="id_name" class="text-sm font-medium text-gray-700">Enterprise Name</label>
-                <input type="text" id="id_name" name="name" value="{{ form.name.value }}" class="mt-1 p-2 border rounded" placeholder="Full Name of the Enterprise">
-            </div>
-
-            {% comment %} <!-- City -->
-            <div class="flex flex-col">
-                <label for="id_city" class="text-sm font-medium text-gray-700">City</label>
-                <input type="text" id="id_city" name="city" value="{{ form.city.value }}" class="mt-1 p-2 border rounded" placeholder="City where the enterprise is located">
-            </div>
 
             <!-- State -->
             <div class="flex flex-col">
@@ -39,13 +28,7 @@
                     {% for state, state_label in form.state.field.choices %}
                         <option value="{{ state }}" {% if form.state.value == state %}selected{% endif %}>{{ state_label }}</option>
                     {% endfor %}
-                </select>
-            </div>
-
-            <!-- Zip Code -->
-            <div class="flex flex-col">
-                <label for="id_zip" class="text-sm font-medium text-gray-700">Zip Code</label>
-                <input type="text" id="id_zip" name="zip" value="{{ form.zip.value }}" class="mt-1 p-2 border rounded" placeholder="Zip Code" maxlength="5">
+                </select> 
             </div>
 
             <!-- Bank Name -->
@@ -54,27 +37,22 @@
                 <input type="text" id="id_bank" name="bank" value="{{ form.bank.value }}" class="mt-1 p-2 border rounded" placeholder="Bank Name">
             </div>
 
-            <!-- Bank State -->
+            <!-- NAICS -->
             <div class="flex flex-col">
-                <label for="id_bank_state" class="text-sm font-medium text-gray-700">Bank State</label>
-                <select id="id_bank_state" name="bank_state" class="mt-1 p-2 border rounded">
-                    <option value="" disabled {% if not form.bank_state.value %}selected{% endif %}>Select Bank State</option>
-                    {% for state, state_label in form.bank_state.field.choices %}
-                        <option value="{{ state }}" {% if form.bank_state.value == state %}selected{% endif %}>{{ state_label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Gr Appv -->
-            <div class="flex flex-col">
-                <label for="id_gr_appv" class="text-sm font-medium text-gray-700">Loan Amount (e.g., 1,000.00 or 100.50)</label>
-                <input type="number" id="id_gr_appv" name="term" value="{{ form.gr_appv.value }}" class="mt-1 p-2 border rounded" placeholder="Loan Amount Requested">
-            </div>
+                <label for="id_naics" class="text-sm font-medium text-gray-700">NAICS Code</label>
+                <input type="text" id="id_naics" name="naics" value="{{ form.naics.value }}" class="mt-1 p-2 border rounded" placeholder="NAICS Code">
+            </div> 
 
             <!-- Loan Term -->
             <div class="flex flex-col">
                 <label for="id_term" class="text-sm font-medium text-gray-700">Loan Term (Months)</label>
                 <input type="number" id="id_term" name="term" value="{{ form.term.value }}" class="mt-1 p-2 border rounded" placeholder="Loan Term in Months">
+            </div> 
+
+            <!-- Number of Employees -->
+            <div class="flex flex-col">
+                <label for="id_no_emp" class="text-sm font-medium text-gray-700">Number of Employees</label>
+                <input type="number" id="id_no_emp" name="no_emp" value="{{ form.no_emp.value }}" class="mt-1 p-2 border rounded" placeholder="Number of Employees">
             </div>
 
             <!-- New or Existing Business -->
@@ -85,19 +63,61 @@
                         <option value="{{ choice }}" {% if form.new_exist.value == choice %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
-            </div>
+            </div> 
 
-            <!-- Jobs Created/Retained -->
+            <!-- Jobs Created -->
             <div class="flex flex-col">
                 <label for="id_create_job" class="text-sm font-medium text-gray-700">Jobs Created</label>
                 <input type="number" id="id_create_job" name="create_job" value="{{ form.create_job.value }}" class="mt-1 p-2 border rounded" placeholder="Number of Jobs to be Created">
             </div>
 
+            <!-- Jobs Retained -->
             <div class="flex flex-col">
                 <label for="id_retained_job" class="text-sm font-medium text-gray-700">Jobs Retained</label>
-                <input type="number" id="id_retained_job" name="retained_job" value="{{ form.retained_job.value }}" class="mt-1 p-2 border rounded" placeholder="Number of Jobs to be Retained">
+                <input type="number" id="id_retained_job" name="retained_job" value="{{ form.retained_job.value }}" class="mt-1 p-2 border rounded" placeholder="Number of Jobs to be Created">
             </div>
-        </div> {% endcomment %}
+
+            <!-- Urban Rural  -->
+            <div class="flex flex-col">
+                <label for="id_urban_rural" class="text-sm font-medium text-gray-700">Urban or Rural</label>
+                <select id="id_urban_rural" name="urban_rural" class="mt-1 p-2 border rounded">
+                    {% for choice, label in form.urban_rural.field.choices %}
+                        <option value="{{ choice }}" {% if form.urban_rural.value == choice %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div> 
+
+            <!-- Revolving Line of Credit  -->
+            <div class="flex flex-col">
+                <label for="id_rev_line_cr" class="text-sm font-medium text-gray-700">Rev Line Credit</label>
+                <select id="id_rev_line_cr" name="rev_line_cr" class="mt-1 p-2 border rounded">
+                    {% for choice, label in form.rev_line_cr.field.choices %}
+                        <option value="{{ choice }}" {% if form.rev_line_cr.value == choice %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>  
+
+            <!-- Low Doc  -->
+            <div class="flex flex-col">
+                <label for="id_low_doc" class="text-sm font-medium text-gray-700">Low Doc</label>
+                <select id="id_low_doc" name="low_doc" class="mt-1 p-2 border rounded">
+                    {% for choice, label in form.low_doc.field.choices %}
+                        <option value="{{ choice }}" {% if form.low_doc.value == choice %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>  
+            
+            <!-- Gr Appv -->
+            <div class="flex flex-col">
+                <label for="id_gr_appv" class="text-sm font-medium text-gray-700">Loan Amount (e.g., 1,000.00 or 100.50)</label>
+                <input type="number" id="id_gr_appv" name="term" value="{{ form.gr_appv.value }}" class="mt-1 p-2 border rounded" placeholder="Loan Amount Requested">
+            </div>
+
+            <!-- Franchise Code -->
+            <div class="flex flex-col">
+                <label for="id_franchise_code" class="text-sm font-medium text-gray-700">Franchise Code</label>
+                <input type="text" id="id_franchise_code" name="franchise_code" value="{{ form.franchise_code.value | default_if_none:'' }}" class="mt-1 p-2 border rounded" placeholder="Franchise Code" maxlength="5">
+            </div>
 
         <!-- Submit Button -->
         <div class="mt-6">

@@ -1,176 +1,160 @@
 <!DOCTYPE html>
-<html>
-   <head>
-      <!-- basic -->
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <!-- mobile metas -->
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-      <!-- site metas -->
-      <title>Benten</title>
-      <meta name="keywords" content="">
-      <meta name="description" content="">
-      <meta name="author" content="">
-      <!-- bootstrap css -->
-      <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-      <!-- style css -->
-      <link rel="stylesheet" type="text/css" href="css/style.css">
-      <!-- Responsive-->
-      <link rel="stylesheet" href="css/responsive.css">
-      <!-- fevicon -->
-      <link rel="icon" href="images/fevicon.png" type="image/gif" />
-      <!-- font css -->
-      <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
-      <!-- Scrollbar Custom CSS -->
-      <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css">
-      <!-- Tweaks for older IEs-->
-      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-   </head>
-   <body>
-      <div class="header_section">
-         <div class="container-fluid">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-               <a class="navbar-brand" href="index.html"><img src="images/logo.png"></a>
-               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                 <span class="navbar-toggler-icon"></span>
-               </button>
-               <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav ml-auto">
-                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="services.html">Services</a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="blog.html">Blog</a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="testimonial.html">Testimonial</a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact Us</a>
-                     </li>
-                  </ul>
-                 <form class="form-inline my-2 my-lg-0">
-                   <div class="login_bt">
-                        <ul>
-                           <li><a href="#"><i class="fa fa-search" aria-hidden="true"></i></a></li>
-                           <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i></a></li>
-                        </ul>
-                     </div>
-                 </form>
-               </div>
-            </nav>
-         </div>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us</title>
+  <!-- Correct static path for favicon -->
+  <link rel="icon" href="{% static 'images/fevicon.png' %}" type="image/gif" />
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/kTcTz+1rZ6t2nQmNX3gZvU4j3Bqhz4C4AXX76S4AOf3/P3BqC96OZ8fJzF+7u0Ju+F2pg+nY6T+0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 font-roboto">
+  <!-- Header Section -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="{% url 'home' %}">
+        <!-- Correct static path for logo -->
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-10" />
+      </a>
+      <nav class="hidden md:flex space-x-6">
+        <a href="{% url 'home' %}" class="text-gray-700 hover:text-gray-900">Home</a>
+        <a href="{% url 'about' %}" class="text-gray-700 hover:text-gray-900">About</a>
+        <a href="{% url 'services' %}" class="text-gray-700 hover:text-gray-900">Services</a>
+        <a href="{% url 'blog' %}" class="text-gray-700 hover:text-gray-900">Blog</a>
+        <a href="{% url 'testimonial' %}" class="text-gray-700 hover:text-gray-900">Testimonial</a>
+        <a href="{% url 'contact' %}" class="text-gray-700 hover:text-gray-900">Contact Us</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <a href="#" class="text-gray-700 hover:text-gray-900"><i class="fas fa-search"></i></a>
+        <a href="#" class="text-gray-700 hover:text-gray-900"><i class="fas fa-user"></i></a>
       </div>
-      <!-- header section end -->      
-      <!-- about section start -->
-      <div class="about_section layout_padding">
-         <div class="container">
-            <div class="row">
-               <div class="col-md-6">
-                  <div class="about_taital_main">
-                     <div class="about_taital">About Us</div>
-                     <p class="about_text">fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors</p>
-                     <div class="read_bt"><a href="#">Read More</a></div>
-                  </div>
-               </div>
-               <div class="col-md-6">
-                  <div class="about_img"><img src="images/about-img.png"></div>
-               </div>
-            </div>
-         </div>
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden">
+      <ul class="px-4 pt-2 pb-4 space-y-2 bg-white">
+        <li><a href="{% url 'home' %}" class="block text-gray-700 hover:text-gray-900">Home</a></li>
+        <li><a href="{% url 'about' %}" class="block text-gray-700 hover:text-gray-900">About</a></li>
+        <li><a href="{% url 'services' %}" class="block text-gray-700 hover:text-gray-900">Services</a></li>
+        <li><a href="{% url 'blog' %}" class="block text-gray-700 hover:text-gray-900">Blog</a></li>
+        <li><a href="{% url 'testimonial' %}" class="block text-gray-700 hover:text-gray-900">Testimonial</a></li>
+        <li><a href="{% url 'contact' %}" class="block text-gray-700 hover:text-gray-900">Contact Us</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- About Section -->
+  <section class="py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <!-- About Text -->
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">About Us</h2>
+          <p class="text-gray-600 mb-6">
+            Fact that a reader will be distracted by the readable content of a page when looking at its layout.
+            The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using
+            "Content here, content here", making it look like readable English. Many desktop publishing packages and web page editors...
+          </p>
+          <a href="#" class="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700">Read More</a>
+        </div>
+        <!-- About Image -->
+        <div>
+          <img src="{% static 'images/about-img.png' %}" alt="About Us" class="w-full rounded shadow" />
+        </div>
       </div>
-      <!-- about section end -->
-      <!-- footer section start -->
-      <div class="footer_section layout_padding">
-         <div class="container">
-            <div class="row">
-               <div class="col-lg-3 col-sm-6">
-                  <h3 class="footer_text">Contact Us</h3>
-                  <div class="location_text">
-                     <ul>
-                        <li>
-                           <a href="#">
-                           <span class="padding_left_10"><i class="fa fa-map-marker" aria-hidden="true"></i></span>Making this the first true</a>
-                        </li>
-                        <li>
-                           <a href="#">
-                           <span class="padding_left_10"><i class="fa fa-phone" aria-hidden="true"></i></span>Call : +01 1234567890
-                           </a>
-                        </li>
-                        <li>
-                           <a href="#">
-                           <span class="padding_left_10"><i class="fa fa-envelope" aria-hidden="true"></i></span>Email : demo@gmail.com
-                           </a>
-                        </li>
-                     </ul>
-                  </div>
-                  <div class="footer_social_icon">
-                     <ul>
-                        <li>
-                           <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                        </li>
-                        <li>
-                             <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                        </li>
-                        <li>
-                           <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                        </li>
-                        <li>
-                           <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                        </li>
-                     </ul>
-                  </div>
-               </div>
-                <div class="col-lg-3 col-sm-6">
-                  <h3 class="footer_text">Quick links</h3>
-                  <div class="footer_menu">
-                     <ul>
-                        <li><a href="index.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> Home</a></li>
-                        <li><a href="about.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> About</a></li>
-                        <li><a href="servics.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> Services</a></li>
-                        <li><a href="testimonial.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> Testimonial</a></li>
-                        <li><a href="blog.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> Letest News</a></li>
-                        <li><a href="contact.html"><span class="angle_icon"><i class="fa fa-angle-right" aria-hidden="true"></i></span> Contact us</a></li>
-                     </ul>
-                  </div>
-               </div>
-               <div class="col-lg-3 col-sm-6">
-                  <h3 class="footer_text">Info</h3>
-                  <p class="lorem_text">necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words,</p>
-               </div>
-               <div class="col-lg-3 col-sm-6">
-                  <h3 class="footer_text">Subscribe email</h3>
-                  <textarea class="email-text" placeholder="Your Email" rows="5" id="comment" name="Your Email"></textarea>
-                  <div class="submit_bt"><a href="#">Subscribe</a></div>
-               </div>
-            </div>
-         </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="bg-gray-800 text-gray-200 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Contact Us -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
+          <ul class="space-y-2">
+            <li>
+              <a href="#" class="flex items-center hover:text-white">
+                <i class="fas fa-map-marker-alt mr-2"></i>
+                Making this the first true
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center hover:text-white">
+                <i class="fas fa-phone mr-2"></i>
+                Call : +01 1234567890
+              </a>
+            </li>
+            <li>
+              <a href="#" class="flex items-center hover:text-white">
+                <i class="fas fa-envelope mr-2"></i>
+                Email : demo@gmail.com
+              </a>
+            </li>
+          </ul>
+          <div class="flex space-x-4 mt-4">
+            <a href="#" class="hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="hover:text-white"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="{% url 'home' %}" class="hover:text-white">Home</a></li>
+            <li><a href="{% url 'about' %}" class="hover:text-white">About</a></li>
+            <li><a href="{% url 'services' %}" class="hover:text-white">Services</a></li>
+            <li><a href="{% url 'testimonial' %}" class="hover:text-white">Testimonial</a></li>
+            <li><a href="{% url 'blog' %}" class="hover:text-white">Latest News</a></li>
+            <li><a href="{% url 'contact' %}" class="hover:text-white">Contact Us</a></li>
+          </ul>
+        </div>
+        <!-- Info -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Info</h3>
+          <p class="text-gray-400">
+            Necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words.
+          </p>
+        </div>
+        <!-- Subscribe Email -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Subscribe Email</h3>
+          <textarea placeholder="Your Email" rows="4" class="w-full p-2 rounded text-gray-800"></textarea>
+          <a href="#" class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Subscribe</a>
+        </div>
       </div>
-      <!-- footer section end -->
-      <!-- copyright section start -->
-      <div class="copyright_section">
-         <div class="container">
-            <p class="copyright_text">2020 All Rights Reserved. Design by <a href="https://html.design">Free Html Templates</a></p>
-         </div>
-      </div>
-      <!-- copyright section end -->
-      <!-- Javascript files-->
-      <script src="js/jquery.min.js"></script>
-      <script src="js/popper.min.js"></script>
-      <script src="js/bootstrap.bundle.min.js"></script>
-      <script src="js/jquery-3.0.0.min.js"></script>
-      <script src="js/plugin.js"></script>
-      <!-- sidebar -->
-      <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
-      <script src="js/custom.js"></script>
-      <!-- javascript --> 
-   </body>
+    </div>
+  </footer>
+
+  <!-- Copyright Section -->
+  <div class="bg-gray-900 py-4">
+    <div class="container mx-auto px-4 text-center text-gray-400">
+      <p>
+        2020 All Rights Reserved. Design by
+        <a href="https://html.design" class="text-blue-400 hover:underline">Free Html Templates</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript for Mobile Menu Toggle -->
+  <script>
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
+</body>
 </html>

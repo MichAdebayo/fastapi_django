@@ -53,16 +53,28 @@ class UserProfileForm(forms.ModelForm):
 class LoanRequestForm(forms.ModelForm):
     class Meta:
         model = LoanRequest
-        fields = [ 'name',
-            # 'name', 'city', 'state', 'zip', 'bank',
-            # 'bank_state', 'naics', 'term','no_emp', 'new_exist',
-            #  'create_job', 'retained_job', 'franchise_code',
-            # 'urban_rural', 'rev_line_cr', 'low_doc', 'gr_appv', 
-        ]
+        fields = [
+            'state', 'bank', 'naics', 'term', 'no_emp',
+            'new_exist', 'create_job', 'retained_job', 'urban_rural', 
+            'rev_line_cr', 'low_doc', 'gr_appv', 'franchise_code',
+            ]
 
-        # widgets = {
-        #     'gr_appv': forms.NumberInput(attrs={'step': '0.01'}),
-        # }
+        # State : str
+        # Bank : str
+        # NAICS : int
+        # Term : int
+        # NoEmp : int
+        # NewExist : int
+        # CreateJob : int
+        # RetainedJob: int
+        # UrbanRural: int
+        # RevLineCr: int
+        # LowDoc: int
+        # GrAppv: int
+        # Recession: int
+        # HasFranchise: int
+
+
 # class ApprovalSimulationForm(forms.ModelForm):
  
 #     class Meta:

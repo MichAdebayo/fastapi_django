@@ -19,35 +19,38 @@
     <!-- Header -->
     <header class="shadow" style="background-color: #3f3d88;">
       <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="{% url 'home' %}" class="flex items-center">
-         <img src="{% static 'images/testlogo.png' %}" alt="SBA Inc." class="h-10" />
-        </a>
-        <nav class="hidden lg:flex space-x-6">
-          <a href="{% url 'home' %}" class="block text-white hover:text-[#e93710]">Home</a>
-          {% comment %} <a href="{% url 'about' %}" class="block text-gray-700 hover:text-blue-600">About</a>
-          <a href="{% url 'services' %}" class="block text-gray-700 hover:text-blue-600">Services</a>
-          <a href="{% url 'blog' %}" class="block text-gray-700 hover:text-blue-600">Blog</a>
-          <a href="{% url 'testimonial' %}" class="block text-gray-700 hover:text-blue-600">Testimonial</a>
-          <a href="{% url 'contact' %}" class="block text-gray-700 hover:text-blue-600">Contact Us</a> {% endcomment %}
-        </nav>
-        <div class="flex items-center space-x-4">
-          <a href="#" class="text-white hover:text-[#e93710]">
-            <i class="fas fa-search"></i>
+          <a href="{% url 'home' %}" class="flex items-center">
+              <img src="{% static 'images/testlogo.png' %}" alt="SBA Inc." class="h-10" />
           </a>
-          <a href="#" class="text-white hover:text-[#e93710]" id="user-icon">
-            <i class="fas fa-user"></i>
-          </a>
-          
-          <!-- Dropdown Menu -->
-          <div id="dropdown-menu" class="hidden bg-gray-800 text-white rounded shadow-md mt-2 absolute">
-            <a href="#" class="block px-4 py-2 hover:bg-[#e93710]">client</a>
-            <a href="#" class="block px-4 py-2 hover:bg-[#e93710]">admin</a>
-          </div>
-          
-          </a>
+          <nav class="hidden lg:flex space-x-6">
+              <a href="{% url 'home' %}" class="block text-white hover:text-[#e93710]">Home</a>
+              <a href="{% url 'about' %}" class="block text-white hover:text-[#e93710]">About</a>
+              <a href="{% url 'services' %}" class="block text-white hover:text-[#e93710]">Services</a>
+              <a href="{% url 'blog' %}" class="block text-white hover:text-[#e93710]">Blog</a>
+              <a href="{% url 'testimonial' %}" class="block text-white hover:text-[#e93710]">Testimonial</a>
+              <a href="{% url 'contact' %}" class="block text-white hover:text-[#e93710]">Contact Us</a>
+          </nav>
+          <div class="flex items-center space-x-4">
+              <!-- Original Search Button -->
+              <a href="#" class="text-white hover:text-[#e93710]">
+                  <i class="fas fa-search"></i>
+              </a>
+  
+              <!-- User Dropdown -->
+              <div class="relative">
+                  <a href="#" class="text-white hover:text-[#e93710]" id="user-icon">
+                      <i class="fas fa-user"></i>
+                  </a>
+                  <!-- Dropdown Menu -->
+                  <div id="dropdown-menu" class="hidden bg-gray-800 text-white rounded shadow-md mt-2 absolute right-0 z-10 min-w-[120px]">
+                      <a href="{% url 'login' %}" class="block px-4 py-2 hover:bg-[#e93710]">Client</a>
+                      <a href="#" class="block px-4 py-2 hover:bg-[#e93710]">Admin</a>
+                  </div>
+              </div>  
+
           <!-- Mobile menu button -->
           <button
-            class="lg:hidden block text-gray-700 hover:text-blue-600 focus:outline-none"
+            class="lg:hidden block text-white hover:text-[#e93710] focus:outline-none"
             id="mobile-menu-button"
           >
             <i class="fas fa-bars"></i>
@@ -55,14 +58,14 @@
         </div>
       </div>
       <!-- Mobile Menu -->
-      <div class="lg:hidden" id="mobile-menu" style="display: none;">
+      <div class="lg:hidden hidden" id="mobile-menu">
         <nav class="px-4 pt-2 pb-4 bg-gray-100 space-y-1">
           <a href="{% url 'home' %}" class="block text-gray-700 hover:text-blue-600">Home</a>
-          {% comment %} <a href="{% url 'about' %}" class="block text-gray-700 hover:text-blue-600">About</a>
+          <a href="{% url 'about' %}" class="block text-gray-700 hover:text-blue-600">About</a>
           <a href="{% url 'services' %}" class="block text-gray-700 hover:text-blue-600">Services</a>
           <a href="{% url 'blog' %}" class="block text-gray-700 hover:text-blue-600">Blog</a>
           <a href="{% url 'testimonial' %}" class="block text-gray-700 hover:text-blue-600">Testimonial</a>
-          <a href="{% url 'contact' %}" class="block text-gray-700 hover:text-blue-600">Contact Us</a> {% endcomment %}
+          <a href="{% url 'contact' %}" class="block text-gray-700 hover:text-blue-600">Contact Us</a> 
         </nav>
       </div>
     </header>
@@ -112,27 +115,27 @@
                 </a>
                 </li>
                 <li>
-                {% comment %} <a href="{% url 'about' %}" class="flex items-center hover:text-blue-400"> {% endcomment %}
+                <a href="{% url 'about' %}" class="flex items-center hover:text-blue-400">
                     <i class="fas fa-angle-right mr-2"></i>About
                 </a>
                 </li>
                 <li>
-                {% comment %} <a href="{% url 'services' %}" class="flex items-center hover:text-blue-400"> {% endcomment %}
+                <a href="{% url 'services' %}" class="flex items-center hover:text-blue-400">
                     <i class="fas fa-angle-right mr-2"></i>Services
                 </a>
                 </li>
                 <li>
-                {% comment %} <a href="{% url 'testimonial' %}" class="flex items-center hover:text-blue-400"> {% endcomment %}
+                <a href="{% url 'testimonial' %}" class="flex items-center hover:text-blue-400">
                     <i class="fas fa-angle-right mr-2"></i>Testimonial
                 </a>
                 </li>
                 <li>
-                {% comment %} <a href="{% url 'blog' %}" class="flex items-center hover:text-blue-400"> {% endcomment %}
+                <a href="{% url 'blog' %}" class="flex items-center hover:text-blue-400">
                     <i class="fas fa-angle-right mr-2"></i>Latest News
                 </a>
                 </li>
                 <li>
-                {% comment %} <a href="{% url 'contact' %}" class="flex items-center hover:text-blue-400"> {% endcomment %}
+                <a href="{% url 'contact' %}" class="flex items-center hover:text-blue-400">
                     <i class="fas fa-angle-right mr-2"></i>Contact Us
                 </a>
                 </li>
@@ -173,10 +176,10 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.style.display =
-            mobileMenu.style.display === 'block' ? 'none' : 'block';
+            mobileMenu.classList.toggle('hidden');
         });
 
+        // User dropdown functionality
         const userIcon = document.getElementById('user-icon');
         const dropdownMenu = document.getElementById('dropdown-menu');
 
@@ -186,10 +189,22 @@
           dropdownMenu.classList.toggle('hidden');
         });
 
-        // Close dropdown if clicking outside of it
+        // Close dropdown if clicking outside
         document.addEventListener('click', (event) => {
           if (!userIcon.contains(event.target) && !dropdownMenu.contains(event.target)) {
             dropdownMenu.classList.add('hidden');
+          }
+        });
+
+        // Search functionality
+        const searchButton = document.querySelector('[type="submit"]');
+        const searchInput = document.getElementById('search-input');
+        
+        searchButton.addEventListener('click', (e) => {
+          if (searchInput.value.trim() === '') {
+            e.preventDefault();
+          }
+        });
         </script>
-    </body>
+  </body>
 </html>

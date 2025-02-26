@@ -1,10 +1,11 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views 
 from .views import ( HomeView, SignupView, UserLoginView, UserWelcomeView, UserProfileView, 
-                    BusinessResourcesView, LoanRequestCreateView, LoanRequestSuccessView, WorkshopsView, LoanRequestStatusView)# , TemplateView, solve_message,predict_charges,AboutView, 
+                    BusinessResourcesView, LoanRequestCreateView, LoanRequestSuccessView, WorkshopsView, LoanRequestStatusView,
+                    AboutView, ServicesView, BlogView, TestimonialView, ContactView, ContactSupportView) # solve_message,predict_charges,
                     # JoinUsView, ApplyView, TemplateView, apply,contact_view, contact_view_user,
-                    # HealthAdvicesView, CybersecurityAwarenessView,message_list_view, ChangePasswordView, 
-                    # PredictChargesView, UserLogoutView,WelcomeView, PredictionHistoryView,book_appointment,get_available_times,TestingView)
+                    #,message_list_view, ChangePasswordView, 
+                    # PredictChargesView, UserLogoutView, PredictionHistoryView,book_appointment,get_available_times)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -17,7 +18,12 @@ urlpatterns = [
     path('user/loan-request/success/', LoanRequestSuccessView.as_view(), name='user_loan_request_success'),
     path('business-resource/', BusinessResourcesView.as_view(), name='business_resources'),
     path('workshops/', WorkshopsView.as_view(), name='workshops'),
-    path('contact-support/', WorkshopsView.as_view(), name='contact_support'),
+    path('about/', AboutView.as_view(), name='about'),
+    path('services/', ServicesView.as_view(), name='services'),
+    path('blog/', BlogView.as_view(), name='blog'),
+    path('testimonial/', TestimonialView.as_view(), name='testimonial'),
+    path('contact/', ContactView.as_view(), name='contact'),
+    path('contact-support/', ContactSupportView.as_view(), name='contact_support'),
 
     # Password (Change or Reset) URLs
     path('reset-password/', auth_views.PasswordResetView.as_view(template_name='sbapp/reset_password.html'), name='reset_password'),]
