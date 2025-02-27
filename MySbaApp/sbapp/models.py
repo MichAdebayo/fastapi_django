@@ -106,10 +106,11 @@ class LoanRequest(models.Model):
     user = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='loan_requests')
 
     loan_simulation_status = models.CharField(max_length=15, default='Pending')
-    loan_simulation_date_utc = models.DateField(null=True)
-    loan_advisor_approval_status = models.CharField(max_length=15, default='Pending')
-    loan_advisor_approval_date_utc = models.DateField(null=True)
+    loan_simulation_date_utc = models.DateField(null=True, blank=True, help_text="Date simulation commitment issued")
 
+    loan_advisor_approval_status = models.CharField(max_length=15, default='Pending')
+    loan_advisor_approval_date_utc = models.DateField(null=True, blank=True, help_text="Date advisor commitment issued")
+        
     ### Enterprise Name
     name = models.CharField(max_length=255, blank=True, help_text="Full Name of the Enterprise")
     

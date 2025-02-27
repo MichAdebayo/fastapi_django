@@ -18,38 +18,50 @@ def populate_users():
 
 def populate_loans() :
 
+    datas = []
+    datas.append( {"user_id": 2, "amount" : 1000 } )
+    datas.append( {"user_id": 2, "amount" : 10000 } )
+    datas.append( {"user_id": 2, "amount" : 100000 } )
+    datas.append( {"user_id": 3, "amount" : 2000 } )
+    datas.append( {"user_id": 3, "amount" : 20000 } ) 
+    datas.append( {"user_id": 3, "amount" : 200000 } )
+    datas.append( {"user_id": 4, "amount" : 3000 } )
+    datas.append( {"user_id": 4, "amount" : 30000 } ) 
+    datas.append( {"user_id": 4, "amount" : 300000 } )
+
     loans = [] 
 
-    loans.append(LoanRequest.objects.create(
-            user_id = 3, 
-            loan_simulation_status = 'Pending',
-            loan_simulation_date_utc = None,
-            loan_advisor_approval_status ='Pending',
-            loan_advisor_approval_date_utc = None,
-            name = "Enterprise",
-            city = "city",
-            no_emp = 0, 
-            franchise_code = 0, 
-            state = LoanRequest.StateType.choices[0][0],
-            zip = None, 
-            bank = "UB",
-            bank_state = LoanRequest.BankStateType.choices[0][0],
-            new_exist = LoanRequest.BusinessType.choices[0][0], 
-            term = 1, 
-            naics="O", 
-            approval_date = None,   
-            approval_fy = "",
-            create_job = 0,
-            retained_job = 0,
-            rev_line_cr = LoanRequest.RevLineCrType.choices[0][0], 
-            low_doc = LoanRequest.LowDocType.choices[0][0],
-            chg_off_date = None,
-            disbursement_date = None,
-            disbursement_gross = 0.0,
-            balance_gross = 0.0,
-            chg_off_prin_gr = 0.0, 
-            gr_appv = 0.0,
-            sba_appv = 0.0))
+    for data in datas :
+        loans.append(LoanRequest.objects.create(
+                user_id = int(data["user_id"]), 
+                loan_simulation_status = 'Pending',
+                loan_simulation_date_utc = None,
+                loan_advisor_approval_status ='Pending',
+                loan_advisor_approval_date_utc = None,
+                name = "Simplon",
+                city = "Lille",
+                no_emp = 0, 
+                franchise_code = 0, 
+                state = LoanRequest.StateType.choices[0][0],
+                zip = None, 
+                bank = "UB",
+                bank_state = LoanRequest.BankStateType.choices[0][0],
+                new_exist = LoanRequest.BusinessType.choices[0][0], 
+                term = 12, 
+                naics="33", 
+                approval_date = None,   
+                approval_fy = "",
+                create_job = 0,
+                retained_job = 0,
+                rev_line_cr = LoanRequest.RevLineCrType.choices[0][0], 
+                low_doc = LoanRequest.LowDocType.choices[0][0],
+                chg_off_date = None,
+                disbursement_date = None,
+                disbursement_gross = 0.0,
+                balance_gross = 0.0,
+                chg_off_prin_gr = 0.0, 
+                gr_appv = float(data["amount"]),
+                sba_appv = 0.0))
 
     loans : list[LoanRequest] = loans
 
@@ -66,5 +78,5 @@ if __name__  == "__main__":
     from django.contrib.auth.models import User
     from sbapp.models import UserProfile, LoanRequest
 
-    #populate_users()
+    populate_users()
     populate_loans()

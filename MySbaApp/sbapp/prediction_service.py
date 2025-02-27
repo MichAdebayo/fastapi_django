@@ -3,7 +3,7 @@ import requests
 class PredictionService() :
     def __init__(self) :
         self.api_url = "http://127.0.0.1:8000"
-        self.current_token
+        self.current_token = None
 
     # def current_token(self) -> str :
     #     return self.curent_token
