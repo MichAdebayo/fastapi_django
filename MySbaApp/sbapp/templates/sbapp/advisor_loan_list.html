@@ -1,0 +1,78 @@
+{% extends 'sbapp/base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Loan Request List</h1>
+
+    <div class="overflow-x-auto">
+        <form method="POST">
+            {% csrf_token %}
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 px-4 py-2">User</th>
+                        <th class="border border-gray-300 px-4 py-2">Amount Requested</th>
+                        <th class="border border-gray-300 px-4 py-2">Simulation </th>
+                        <th class="border border-gray-300 px-4 py-2">Addvisor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in loan_requests %}
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">{{ loan.user.username }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            {% if loan.amount %}
+                                ${{ loan.amount }}
+                            {% else %}
+                                no amount specified
+                            {% endif %}
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <div> <span class="text-yellow-500"> {{ loan.custom_simulation_status }} </span> </div>
+                            {% if loan.custom_simulation_status == NO_STATUS %}
+                            <div>
+                                <button 
+                                    type="submit"
+                                    name= "SIMULATION"
+                                    value="{{ loan.loan_nr_chk_dgt }}" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    REQUEST SIMULATION 
+                                </button>
+                            </div>>
+                            {% else %}
+                            <div> <span class="text-yellow-500"> {{ loan.custom_simulation_date }} </span> </div> 
+                            {% endif %}                             
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <div> <span class="text-yellow-500"> {{ loan.custom_advisor_approval_status }} </span> </div>
+                            {% if loan.custom_advisor_status == "NO_STATUS" %}
+                            <div>
+                                <button 
+                                    type="submit"
+                                    name= "APPROVE"
+                                    value="{{ loan.loan_nr_chk_dgt }}" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    APPROVE
+                                </button>
+                            </div><div>
+                                <button 
+                                    type="submit"
+                                    name= "REJECT"
+                                    value="{{ loan.loan_nr_chk_dgt }}" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    REJECT
+                                </button>
+                            </div>
+                            {% else %}
+                            <div> <span class="text-yellow-500"> {{ loan.custom_advisor_approval_date }} </span> </div> 
+                            {% endif %}                 
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>   
+    </div>
+</div>
+
+{% endblock %}

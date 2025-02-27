@@ -53,10 +53,15 @@ class UserProfileForm(forms.ModelForm):
 class LoanRequestForm(forms.ModelForm):
     class Meta:
         model = LoanRequest
-        fields = [
+        fields = [ 
+            'loan_nr_chk_dgt', 
+            'loan_simulation_status',
+            'loan_simulation_date_utc', 
+            'loan_advisor_approval_status', 
+            'loan_advisor_approval_date_utc',
             'state', 'bank', 'naics', 'term', 'no_emp',
             'new_exist', 'create_job', 'retained_job', 'urban_rural', 
-            'rev_line_cr', 'low_doc', 'gr_appv', 'franchise_code',
+            'rev_line_cr', 'low_doc', 'gr_appv', 'franchise_code'
             ]
 
         # State : str

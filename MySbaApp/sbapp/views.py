@@ -1,4 +1,4 @@
-from django.shortcuts import redirect #, render
+from django.shortcuts import render #, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import LoginView
@@ -6,6 +6,12 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, ListView, FormView, DetailView
+
+
+from .prediction_service import PredictionService
+from django.http import HttpResponseRedirect
+
+
 from .models import UserProfile, LoanRequest #, Job, ContactMessage, PredictionHistory, Appointment,Availability, 
 from .forms import UserSignupForm, UserProfileForm, LoanRequestForm #, ApplicationForm, ChangePasswordForm, PredictChargesForm, AppointmentForm
 # from django.http import HttpResponse
@@ -13,7 +19,7 @@ import random
 # from django.http import JsonResponse
 # import json
 # from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import get_user_model, login #logout, 
+from django.contrib.auth import get_user_model #, login, logout, 
 # from django.conf import settings
 # from django.views import View 
 # import pandas as pd
@@ -152,6 +158,11 @@ class LoanRequestSuccessView(TemplateView):
     
     # # Vous pouvez également implémenter la méthode get si vous avez besoin de gérer l
 
+
+#______________________________________________________________________________
+#
+# region LoanRequestStatusView
+#______________________________________________________________________________
 class LoanRequestStatusView(LoginRequiredMixin, SuccessMessageMixin, FormView):
     template_name = "sbapp/user_loan_status.html"  # Render status page directly
     form_class = LoanRequestForm
@@ -222,9 +233,50 @@ class WorkshopsView(TemplateView):
         ]
         return context
     
-class LoanRequestListView(ListView) : 
-    template_name = 'sbapp/admin_loan_request.html'
+
+
+#______________________________________________________________________________
+#
+# region LoanApprovalStatus
+#______________________________________________________________________________
+class LoanApprovalStatus(TemplateView):
+    model = LoanRequestForm
+    template_name = "sbapp/admin_loan_approval_status.html"
+    context_object_name = 'loan_request'
+
+    template_name = 'mon_template.html'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+        
+    #     # Effectuer un appel à une API externe
+    #     url = "http://127.0.0.1:8000/auth/login"
+    #     try:
+    #         response = requests.get(url)
+    #         response.raise_for_status()  # Vérifie que la requête a réussi
+    #         api_data = response.json()  # Récupère les données de l'API au format JSON
+    #     except requests.exceptions.RequestException as e:
+    #         # Gérer l'exception si l'appel API échoue
+    #         api_data = None
+    #         context['error'] = f"Erreur lors de l'appel à l'API : {str(e)}"
+        
+    #     # Ajouter l'objet Client (ici, le client n°4 par exemple) au contexte
+    #     try:
+    #         client = Client.objects.get(id=4)  # Récupère le client n°4
+    #         context['client'] = client
+    #     except Client.DoesNotExist:
+    #         context['client'] = None
+    #         context['error'] = "Client non trouvé"
+
+    #     # Ajouter les données de l'API au contexte
+    #     context['api_data'] = api_data
+
+    #     return context
+
+
+   
     
+
 
 # class LoanStatusView(LoginRequiredMixin, TemplateView):
 #     """
@@ -506,7 +558,7 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
 #             age = int(data.get('age'))
 #             sex = data.get('sex')
 #             smoker = data.get('smoker')
-#             region = data.get('region')
+#             reg ion = data.get('reg ion')
 #             children = int(data.get('children'))
 #             bmi = float(data.get('bmi'))
 #             bmi_category = data.get('bmi_category')
@@ -798,7 +850,7 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
 #             "bmi": bmi,
 #             "smoker": user_profile.smoker,
 #             "children": user_profile.num_children,
-#             "region": user_profile.region,
+#             "re gion": user_profile.reg ion,
 #             "sex": user_profile.sex
 #         }
 
@@ -820,7 +872,7 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
 #             height=user_profile.height,
 #             num_children=user_profile.num_children,
 #             smoker=user_profile.smoker,
-#             region=user_profile.region,
+#             reg ion=user_profile.reg ion,
 #             sex=user_profile.sex,
 #             predicted_charges=prediction_value
 #         )

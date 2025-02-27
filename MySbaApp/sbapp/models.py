@@ -7,7 +7,56 @@ from django.conf import settings
 import random
 from phonenumber_field.modelfields import PhoneNumberField
 
+
+#______________________________________________________________________________
+#
+# region Newscast
+#______________________________________________________________________________
+class Newscast(models.Model) :
+    """
+    Table news: Stocke les actualités publiées sur la page d’accueil.
+    """
+
+    id =  models.IntegerField(primary_key=True,unique=True, db_index=True)
+    title =  models.CharField(max_length=255)
+    content =  models.TextField()
+    publication_date_utc = models.DateField()
+    published_by = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'sba_news'  
+
+
+#______________________________________________________________________________
+#
+# region Message
+#______________________________________________________________________________
+class Message (models.Model) :
+    """
+    Table messages: Stocke les messages échangés entre clients et conseillers.
+    """
+
+    id =  models.IntegerField(primary_key=True,unique=True, db_index=True)
+    user_id = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    content =  models.TextField()
+    issue_time_utc = models.DateTimeField()
+    
+
+    class Meta:
+        db_table = 'sba_messages'  
+    
+
+#______________________________________________________________________________
+#
+# region UserProfile
+#______________________________________________________________________________
 class UserProfile(AbstractUser):
+    """
+    Table users: Stocke les informations des clients et conseillers.
+    """
+
+    class Meta:
+        db_table = 'sba_users'  
 
     ### 🔹 Other Contact Information ###
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -35,18 +84,31 @@ class UserProfile(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-
+    
+    
+#______________________________________________________________________________
+#
+# region LoanRequest
+#______________________________________________________________________________
 class LoanRequest(models.Model):
-    """Model representing a loan application"""
+    """
+    Table loan_requests: Stocke les demandes de prêt et leur statut.
+    """
 
-    # Link to the user (formerly 'username')
-    user = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='loan_requests')
+    class Meta:
+        db_table = 'sba_loan_requests'  
 
     ### 🔹 Loan Identifier ###
     PREFIX = 1000  # Prefix for LoanNr_ChkDgt
     loan_nr_chk_dgt = models.CharField(primary_key=True, max_length=10, unique=True, db_index=True)
+
+    # Link to the user (formerly 'username')
+    user = models.ForeignKey('UserProfile', on_delete=models.CASCADE, related_name='loan_requests')
+
+    loan_simulation_status = models.CharField(max_length=15, default='Pending')
+    loan_simulation_date_utc = models.DateField(null=True)
+    loan_advisor_approval_status = models.CharField(max_length=15, default='Pending')
+    loan_advisor_approval_date_utc = models.DateField(null=True)
 
     ### Enterprise Name
     name = models.CharField(max_length=255, blank=True, help_text="Full Name of the Enterprise")
@@ -255,7 +317,7 @@ class LoanRequest(models.Model):
     chg_off_prin_gr = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Charged-off amount")
     gr_appv = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Gross amount of loan approved by bank")
     sba_appv = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="SBA’s guaranteed amount of approved loan")
-    loan_status = models.CharField(max_length=15, default='Pending')
+   
 
     # Derived Field: Recession status
     @property

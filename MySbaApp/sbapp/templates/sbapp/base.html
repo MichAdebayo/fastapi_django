@@ -26,6 +26,12 @@
               <a href="{% url 'home' %}" class="block text-white hover:text-[#e93710]">Home</a>
               <a href="{% url 'about' %}" class="block text-white hover:text-[#e93710]">About</a>
               <a href="{% url 'services' %}" class="block text-white hover:text-[#e93710]">Services</a>
+
+              {% if user.is_staff == 1 %}
+              <!-- if user is admin -->
+              <a href="{% url 'advisor_loan_list_name' %}" class="block text-white hover:text-[#e93710]">Loans</a>
+              {% endif %} 
+              
               <a href="{% url 'blog' %}" class="block text-white hover:text-[#e93710]">Blog</a>
               <a href="{% url 'testimonial' %}" class="block text-white hover:text-[#e93710]">Testimonial</a>
               <a href="{% url 'contact' %}" class="block text-white hover:text-[#e93710]">Contact Us</a>
