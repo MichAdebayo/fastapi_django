@@ -7,8 +7,6 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, ListView, FormView, DetailView
 
-
-from .prediction_service import PredictionService
 from django.http import HttpResponseRedirect
 
 

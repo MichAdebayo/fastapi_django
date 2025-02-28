@@ -6,6 +6,8 @@ from django.views.generic import ListView
 
 from django.shortcuts import render 
 
+from typing import Any
+
 from .models import LoanRequest 
 from .forms import LoanRequestForm 
 
@@ -64,38 +66,70 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
         context = self.get_context_data(**kwargs)
     
         if simulate_loan_id :
-            api_service = PredictionService()
-            data = api_service.authenticate("user1.fakemail@fakeprovider.com", "otherpass1")
+            loan_request = self.get_loan_from_context(simulate_loan_id, context)
+            if loan_request :
+                loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=simulate_loan_id)
 
-            message = data
+                approval_status = self.request_simulation(loan_object_in_db)
+                if approval_status :
+                    loan_object_in_db.loan_simulation_status = approval_status
+                    loan_object_in_db.loan_simulation_date_utc = datetime.now(timezone.utc).date()
+                    loan_object_in_db.save()
 
-            for loan_request in context["loan_requests"] :
-                if loan_request.loan_nr_chk_dgt == simulate_loan_id :
+                    loan_request.advisor_view_state = "FINAL"
+                    loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
+                    loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
+
+                else :
                     loan_request.simulation_view_state = "WORKING"
-                    loan_request.custom_simulation_status = message
+                    loan_request.custom_simulation_status = "something wrong happened"
+
+            else :
+                loan_request.simulation_view_state = "WORKING"
+                loan_request.custom_simulation_status = "something wrong happened"
 
         elif reject_loan_id :
-            for loan_request in context["loan_requests"] :
-                if loan_request.loan_nr_chk_dgt == reject_loan_id :
-                    loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=reject_loan_id)
-                    loan_object_in_db.loan_advisor_approval_status = "REJECTED"
-                    loan_object_in_db.loan_advisor_approval_date_utc = datetime.now(timezone.utc).date()
-                    loan_object_in_db.save()
+            loan_request = self.get_loan_from_context(reject_loan_id, context)
+            if loan_request :
+                loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=reject_loan_id)
+                loan_object_in_db.loan_advisor_approval_status = "REJECTED"
+                loan_object_in_db.loan_advisor_approval_date_utc = datetime.now(timezone.utc).date()
+                loan_object_in_db.save()
 
-                    loan_request.advisor_view_state = "FINAL"
-                    loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
-                    loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
+                loan_request.advisor_view_state = "FINAL"
+                loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
+                loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
 
         elif approve_loan_id :
-            for loan_request in context["loan_requests"] :
-                if loan_request.loan_nr_chk_dgt == approve_loan_id :
-                    loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=approve_loan_id)
-                    loan_object_in_db.loan_advisor_approval_status = "APPROVED"
-                    loan_object_in_db.loan_advisor_approval_date_utc = datetime.now(timezone.utc).date()
-                    loan_object_in_db.save()
+            loan_request = self.get_loan_from_context(approve_loan_id, context)
+            if loan_request :
+                loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=approve_loan_id)
+                loan_object_in_db.loan_advisor_approval_status = "APPROVED"
+                loan_object_in_db.loan_advisor_approval_date_utc = datetime.now(timezone.utc).date()
+                loan_object_in_db.save()
 
-                    loan_request.advisor_view_state = "FINAL"
-                    loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
-                    loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
+                loan_request.advisor_view_state = "FINAL"
+                loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
+                loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
 
         return render(request, self.template_name, context)
+    
+    def get_loan_from_context(self, loan_id : int, context: dict[str, Any]):
+        for loan_request in context["loan_requests"] :
+            if loan_request.loan_nr_chk_dgt == loan_id :
+                return loan_request
+            
+        return None
+
+    def request_simulation(self, selected_loan_request : LoanRequest) :
+        api_service = PredictionService()
+        if not api_service.authenticate("user1.fakemail@fakeprovider.com", "otherpass1") :
+            return None
+        
+        loan_prediction = api_service.request_prediction(selected_loan_request)
+        if not loan_prediction :
+            return None
+        
+        return loan_prediction
+
+      
