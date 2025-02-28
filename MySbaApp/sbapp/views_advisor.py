@@ -140,7 +140,7 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
         match approval_status : 
             case "Pending" : return "Pending"
             case "Approved" : return "Will be repaid in full"
-            case "Not Approved" : return "Will be impossible to recover"
+            case "Not approved" : return "Will be impossible to recover"
             case _ : return "Undefined simulation status"
 
       

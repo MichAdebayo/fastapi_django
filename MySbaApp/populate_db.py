@@ -19,15 +19,15 @@ def populate_users():
 def populate_loans() :
 
     datas = []
-    datas.append( {"user_id": 2, "amount" : 1000 } )
-    datas.append( {"user_id": 2, "amount" : 10000 } )
-    datas.append( {"user_id": 2, "amount" : 100000 } )
-    datas.append( {"user_id": 3, "amount" : 2000 } )
-    datas.append( {"user_id": 3, "amount" : 20000 } ) 
-    datas.append( {"user_id": 3, "amount" : 200000 } )
-    datas.append( {"user_id": 4, "amount" : 3000 } )
-    datas.append( {"user_id": 4, "amount" : 30000 } ) 
-    datas.append( {"user_id": 4, "amount" : 300000 } )
+    datas.append( {"user_id": 2, "term" : 6,  "amount" : 50000 } )
+    datas.append( {"user_id": 2, "term" : 30,  "amount" : 50000 } )
+    datas.append( {"user_id": 2, "term" : 60, "amount" : 50000 } )
+    datas.append( {"user_id": 3, "term" : 6, "amount" : 50000 } )
+    datas.append( {"user_id": 3, "term" : 30, "amount" : 50000 } ) 
+    datas.append( {"user_id": 3, "term" : 60, "amount" : 50000 } )
+    datas.append( {"user_id": 4, "term" : 6, "amount" : 50000 } )
+    datas.append( {"user_id": 4, "term" : 30, "amount" : 50000 } ) 
+    datas.append( {"user_id": 4, "term" : 60, "amount" : 50000 } )
 
     loans = [] 
 
@@ -42,19 +42,19 @@ def populate_loans() :
                 city = "Lille",
                 no_emp = 0, 
                 franchise_code = 0, 
-                state = LoanRequest.StateType.choices[0][0],
+                state = "OH", #LoanRequest.StateType.choices[0][0],
                 zip = None, 
-                bank = "UB",
-                bank_state = LoanRequest.BankStateType.choices[0][0],
-                new_exist = LoanRequest.BusinessType.choices[0][0], 
-                term = 12, 
-                naics="33", 
+                bank = "CAPITAL ONE NATL ASSOC",
+                bank_state = "OH", #LoanRequest.BankStateType.choices[0][0],
+                new_exist = '1.0' , #LoanRequest.BusinessType.choices[0][0], 
+                term = data["term"], 
+                naics="54", 
                 approval_date = None,   
                 approval_fy = "",
                 create_job = 0,
-                retained_job = 0,
-                rev_line_cr = LoanRequest.RevLineCrType.choices[0][0], 
-                low_doc = LoanRequest.LowDocType.choices[0][0],
+                retained_job = 3,
+                rev_line_cr = "N", # LoanRequest.RevLineCrType.choices[0][0], 
+                low_doc = "N", #LoanRequest.LowDocType.choices[0][0],
                 chg_off_date = None,
                 disbursement_date = None,
                 disbursement_gross = 0.0,
