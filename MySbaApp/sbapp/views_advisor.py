@@ -1,12 +1,12 @@
 
 from django.http import HttpResponseRedirect
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
 from django.views.generic import ListView, DetailView
 
-from django.shortcuts import render 
+from django.shortcuts import render , get_object_or_404
 from django.urls import reverse
 
 from typing import Any
@@ -22,9 +22,17 @@ from datetime import datetime, timezone # date,
 
 #______________________________________________________________________________
 #
+# region Check if user is admin
+#______________________________________________________________________________
+class AdminOnlyMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
+
+#______________________________________________________________________________
+#
 # region AdvisorLoanRequestListView
 #______________________________________________________________________________
-class AdvisorLoanListView(LoginRequiredMixin, ListView) : 
+class AdvisorLoanListView(LoginRequiredMixin, AdminOnlyMixin, ListView) : 
     model = LoanRequest
     template_name = 'sbapp/advisor_loan_list.html'
     context_object_name = 'loan_requests'
@@ -76,7 +84,7 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
 
         if details_loan_id:
             # Effectuer la redirection vers la page détaillée de l'élément sélectionné
-            return HttpResponseRedirect(reverse('detail', args=[details_loan_id]))
+            return HttpResponseRedirect(reverse('advisor_loan_details_name', args=[details_loan_id]))
     
         elif simulate_loan_id :
             loan_request = self.get_loan_from_context(simulate_loan_id, context)
@@ -90,7 +98,6 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
                     loan_object_in_db.save()
 
                     loan_response_info = LoanResponseInfo.objects.create(
-                        loan_id=simulate_loan_id,
                         approval_status = loan_response_data.approval_status,
                         approval_proba_0 = loan_response_data.approval_proba_0,
                         approval_proba_1 = loan_response_data.approval_proba_1, 
@@ -109,7 +116,8 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
                         feat_imp_recession = loan_response_data.feat_imp_recession,  
                         feat_imp_has_franchise = loan_response_data.feat_imp_has_franchise,
                     )
-                    loan_response_info.save()
+                    loan_object_in_db.data = loan_response_info
+                    loan_object_in_db.save()
 
                     loan_request.simulation_view_state = "FINAL"
                     loan_request.custom_simulation_status = self.get_custom_simulation_status(loan_object_in_db.loan_simulation_status)
@@ -178,8 +186,23 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
 #
 # region AdvisorLoanDetailsView
 #______________________________________________________________________________
-class AdvisorLoanDetailsView(DetailView) :
+class AdvisorLoanDetailsView(LoginRequiredMixin, AdminOnlyMixin, DetailView) :
     model = LoanRequest
-    template_name = "advisor_loan_details"
-    context_object_name = 'advised_loan'
-      
+    template_name = "sbapp/advisor_loan_details.html"
+    context_object_name = 'loan'
+
+    def get_object(self, queryset=None):
+        loan_id = self.kwargs.get('loan_id')  
+        return get_object_or_404(LoanRequest, loan_nr_chk_dgt=loan_id)  
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        loan_request : LoanRequest = self.object
+        loan_data = loan_request.data
+        user = loan_request.user
+
+        context['loan_data'] = loan_data
+        context['user'] = user
+
+        return context

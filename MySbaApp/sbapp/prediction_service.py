@@ -56,6 +56,7 @@ class PredictionService() :
             "Authorization": f"Bearer {self.access_token}"
         }
 
+
         response = requests.post(
             method_url,
             data = request_data.model_dump_json(),
