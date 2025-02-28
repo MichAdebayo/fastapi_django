@@ -13,7 +13,8 @@ from .forms import LoanRequestForm
 
 from .prediction_service import PredictionService
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone # date, 
+#from zoneinfo import ZoneInfo
 
 
 #______________________________________________________________________________
@@ -25,6 +26,10 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
     template_name = 'sbapp/advisor_loan_list.html'
     context_object_name = 'loan_requests'
 
+    # def __init__(self, **kwargs) :
+    #     super().__init__(**kwargs)
+    #     self.local_timezone = ZoneInfo('Europe/Paris') 
+        
     def get_context_data(self, **kwargs):
         self.object_list = LoanRequest.objects.all()
         context = super().get_context_data(**kwargs)
@@ -37,12 +42,12 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
             match loan_request.loan_simulation_status : 
                 case "Pending" :
                     loan_request.simulation_view_state = "INITIAL"
-                    loan_request.custom_simulation_status = loan_request.loan_simulation_status
+                    loan_request.custom_simulation_status = "Pending"
                     loan_request.custom_simulation_date = "no simulation date"
                 case _ :
                     loan_request.simulation_view_state = "FINAL"
-                    loan_request.custom_simulation_status = loan_request.loan_simulation_status
-                    loan_request.custom_simulation_date = loan_request.loan_simulation_status
+                    loan_request.custom_simulation_status = self.get_custom_simulation_status(loan_request.loan_simulation_status)
+                    loan_request.custom_simulation_date = loan_request.loan_simulation_date_utc
 
             match loan_request.loan_advisor_approval_status : 
                 case "Pending" :
@@ -53,8 +58,7 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
                 case _ : 
                     loan_request.advisor_view_state = "FINAL"
                     loan_request.custom_advisor_approval_status = loan_request.loan_advisor_approval_status
-                    loan_request.custom_advisor_approval_date = loan_request.loan_advisor_approval_date_utc
-                    
+                    loan_request.custom_advisor_approval_date = loan_request.loan_advisor_approval_date_utc 
 
         return context
     
@@ -76,9 +80,9 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
                     loan_object_in_db.loan_simulation_date_utc = datetime.now(timezone.utc).date()
                     loan_object_in_db.save()
 
-                    loan_request.advisor_view_state = "FINAL"
-                    loan_request.custom_advisor_approval_status = loan_object_in_db.loan_advisor_approval_status
-                    loan_request.custom_advisor_approval_date = loan_object_in_db.loan_advisor_approval_date_utc
+                    loan_request.simulation_view_state = "FINAL"
+                    loan_request.custom_simulation_status = self.get_custom_simulation_status(loan_object_in_db.loan_simulation_status)
+                    loan_request.custom_simulation_date = loan_object_in_db.loan_simulation_date_utc
 
                 else :
                     loan_request.simulation_view_state = "WORKING"
@@ -131,5 +135,12 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
             return None
         
         return loan_prediction
+    
+    def get_custom_simulation_status(self, approval_status : str ) -> str :
+        match approval_status : 
+            case "Pending" : return "Pending"
+            case "Approved" : return "Will be repaid in full"
+            case "Not Approved" : return "Will be impossible to recover"
+            case _ : return "Undefined simulation status"
 
       

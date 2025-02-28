@@ -57,14 +57,14 @@ class PredictionService() :
 
         response = requests.post(
             method_url,
-            json = request_data.model_dump_json(),
+            data = request_data.model_dump_json(),
             headers = headers
         )
 
         if response.status_code == 200 :
             api_data = response.json()
             try:
-                response_data = LoanResponseData.model_validate_json(api_data)
+                response_data = LoanResponseData.model_validate(api_data)
                 return response_data.approval_status
             except:
                 pass
