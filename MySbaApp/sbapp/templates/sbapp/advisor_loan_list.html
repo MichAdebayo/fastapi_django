@@ -28,7 +28,18 @@
                             {% endif %}
                         </td>
                         <td class="border border-gray-300 px-4 py-2">
-                            <div> <span class="text-yellow-500"> {{ loan.custom_simulation_status }} </span> </div>
+                            <div> 
+                                <span class="text-yellow-500"> {{ loan.custom_simulation_status }} </span> 
+                                {% if loan.simulation_view_state == "FINAL" %}
+                                <button 
+                                    type="submit"
+                                    name="DETAILS"
+                                    value="{{ loan.loan_nr_chk_dgt }}" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    DETAILS 
+                                </button>
+                                {% endif %}
+                            </div>
                             {% if loan.simulation_view_state != "FINAL" %}
                             <div>
                                 <button 

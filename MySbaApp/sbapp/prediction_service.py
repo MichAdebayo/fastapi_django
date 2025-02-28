@@ -1,4 +1,5 @@
 import requests
+from typing import Optional
 from .prediction_service_data import LoanRequestData, LoanResponseData
 from .models import LoanRequest
 
@@ -31,7 +32,7 @@ class PredictionService() :
 
         return False
     
-    def request_prediction(self, db_loan_request : LoanRequest) : 
+    def request_prediction(self, db_loan_request : LoanRequest) -> Optional[LoanResponseData]: 
         method_url = self.api_url + "/" + "/loans/request"
 
         request_data = LoanRequestData(
@@ -65,7 +66,7 @@ class PredictionService() :
             api_data = response.json()
             try:
                 response_data = LoanResponseData.model_validate(api_data)
-                return response_data.approval_status
+                return response_data
             except:
                 pass
         

@@ -1,14 +1,17 @@
 
+from django.http import HttpResponseRedirect
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from django.shortcuts import render 
+from django.urls import reverse
 
 from typing import Any
 
-from .models import LoanRequest 
+from .models import LoanRequest, LoanResponseInfo
 from .forms import LoanRequestForm 
 
 from .prediction_service import PredictionService
@@ -62,23 +65,51 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
 
         return context
     
+    
     def post(self, request, *args, **kwargs):
         simulate_loan_id = request.POST.get('SIMULATE')
         approve_loan_id = request.POST.get('APPROVE')
         reject_loan_id = request.POST.get('REJECT')
+        details_loan_id = request.POST.get('DETAILS')
 
         context = self.get_context_data(**kwargs)
+
+        if details_loan_id:
+            # Effectuer la redirection vers la page détaillée de l'élément sélectionné
+            return HttpResponseRedirect(reverse('detail', args=[details_loan_id]))
     
-        if simulate_loan_id :
+        elif simulate_loan_id :
             loan_request = self.get_loan_from_context(simulate_loan_id, context)
             if loan_request :
                 loan_object_in_db = LoanRequest.objects.get(loan_nr_chk_dgt=simulate_loan_id)
 
-                approval_status = self.request_simulation(loan_object_in_db)
-                if approval_status :
-                    loan_object_in_db.loan_simulation_status = approval_status
+                loan_response_data = self.request_simulation(loan_object_in_db)
+                if loan_response_data :
+                    loan_object_in_db.loan_simulation_status = loan_response_data.approval_status
                     loan_object_in_db.loan_simulation_date_utc = datetime.now(timezone.utc).date()
                     loan_object_in_db.save()
+
+                    loan_response_info = LoanResponseInfo.objects.create(
+                        loan_id=simulate_loan_id,
+                        approval_status = loan_response_data.approval_status,
+                        approval_proba_0 = loan_response_data.approval_proba_0,
+                        approval_proba_1 = loan_response_data.approval_proba_1, 
+                        feat_imp_state = loan_response_data.feat_imp_state, 
+                        feat_imp_bank = loan_response_data.feat_imp_bank, 
+                        feat_imp_naics = loan_response_data.feat_imp_naics,
+                        feat_imp_term = loan_response_data.feat_imp_term,
+                        feat_imp_no_emp = loan_response_data.feat_imp_no_emp,
+                        feat_imp_new_exist = loan_response_data.feat_imp_new_exist,
+                        feat_imp_create_job = loan_response_data.feat_imp_create_job, 
+                        feat_imp_retained_job = loan_response_data.feat_imp_retained_job,
+                        feat_imp_urban_rural = loan_response_data.feat_imp_urban_rural, 
+                        feat_imp_rev_line_cr = loan_response_data.feat_imp_rev_line_cr,
+                        feat_imp_low_doc = loan_response_data.feat_imp_low_doc,  
+                        feat_imp_gr_appv = loan_response_data.feat_imp_gr_appv,  
+                        feat_imp_recession = loan_response_data.feat_imp_recession,  
+                        feat_imp_has_franchise = loan_response_data.feat_imp_has_franchise,
+                    )
+                    loan_response_info.save()
 
                     loan_request.simulation_view_state = "FINAL"
                     loan_request.custom_simulation_status = self.get_custom_simulation_status(loan_object_in_db.loan_simulation_status)
@@ -143,4 +174,12 @@ class AdvisorLoanListView(LoginRequiredMixin, ListView) :
             case "Not approved" : return "Will be impossible to recover"
             case _ : return "Undefined simulation status"
 
+#______________________________________________________________________________
+#
+# region AdvisorLoanDetailsView
+#______________________________________________________________________________
+class AdvisorLoanDetailsView(DetailView) :
+    model = LoanRequest
+    template_name = "advisor_loan_details"
+    context_object_name = 'advised_loan'
       

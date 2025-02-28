@@ -88,6 +88,37 @@ class UserProfile(AbstractUser):
     
 #______________________________________________________________________________
 #
+# region LoanResponseInfo
+#______________________________________________________________________________
+class LoanResponseInfo(models.Model) :
+    """
+    Table loan_response_info : Stocke les données relatives à une prédiction.
+    """
+
+    loan = models.ForeignKey('LoanRequest', on_delete=models.CASCADE, related_name='data')
+    approval_status = models.CharField(max_length=15)
+    approval_proba_0 = models.DecimalField(decimal_places=6)
+    approval_proba_1 = models.DecimalField(decimal_places=6)
+    feat_imp_state = models.DecimalField(decimal_places=2)
+    feat_imp_bank = models.DecimalField(decimal_places=2)
+    feat_imp_naics = models.DecimalField(decimal_places=2)
+    feat_imp_term = models.DecimalField(decimal_places=2) 
+    feat_imp_no_emp = models.DecimalField(decimal_places=2)
+    feat_imp_new_exist = models.DecimalField(decimal_places=2) 
+    feat_imp_create_job = models.DecimalField(decimal_places=2)  
+    feat_imp_retained_job = models.DecimalField(decimal_places=2)  
+    feat_imp_urban_rural = models.DecimalField(decimal_places=2)  
+    feat_imp_rev_line_cr = models.DecimalField(decimal_places=2) 
+    feat_imp_low_doc = models.DecimalField(decimal_places=2)  
+    feat_imp_gr_appv = models.DecimalField(decimal_places=2)  
+    feat_imp_recession = models.DecimalField(decimal_places=2)  
+    feat_imp_has_franchise = models.DecimalField(decimal_places=2)
+
+    class Meta:
+        db_table = 'sba_loan_requests_feat_imp'  
+
+#______________________________________________________________________________
+#
 # region LoanRequest
 #______________________________________________________________________________
 class LoanRequest(models.Model):

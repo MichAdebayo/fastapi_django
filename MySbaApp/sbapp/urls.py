@@ -8,7 +8,7 @@ from .views import ( HomeView, SignupView, UserLoginView, UserWelcomeView, UserP
                     #,message_list_view, ChangePasswordView, 
                     # PredictChargesView, UserLogoutView, PredictionHistoryView,book_appointment,get_available_times)
 
-from .views_advisor import AdvisorLoanListView
+from .views_advisor import AdvisorLoanListView, AdvisorLoanDetailsView
 
 
 urlpatterns = [
@@ -39,6 +39,7 @@ urlpatterns = [
     # path('logout/', UserLogoutView.as_view(), name='logout_user'), 
 
     path('advisor-loan-list-path/', AdvisorLoanListView.as_view(), name='advisor_loan_list_name'),
+    path('advisor-loan-detail-path/<int:pk>/', AdvisorLoanDetailsView.as_view(), name='advisor_loan_detail_name'),
     #path('admin-loan-status/<int:loan_nr_chk_dgt>', LoanApprovalStatus.as_view(), name='loan_approval_status'),
 
 ]

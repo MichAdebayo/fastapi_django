@@ -1,0 +1,96 @@
+{% extends 'sbapp/base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Loan details</h1>
+
+    <div> <span> Customer : {{ loan.user.username }}, status : {{ loan.simulation_status }} </span> </div>
+    <div> <span> prediction date : {{ loan.simulation_date_utc }} </span> </div>
+
+    <div> <span> "negative event" proba : {{ loan.prediction_datas.proba_0 }} </span> </div>
+    <div> <span> "postitive event" proba : {{ loan.prediction_datas.proba_1 }} </span> </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 px-4 py-2"> Feature</th>
+                    <th class="border border-gray-300 px-4 py-2"> Loan value</th>
+                    <th class="border border-gray-300 px-4 py-2"> Importance </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> state </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.state }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_state }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> bank </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.bank }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_bank }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> naics </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.naics }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_naics }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> term </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.term }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_term }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> no_emp </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.no_emp }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_no_emp }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> new_exist </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.new_exist }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_new_exist }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> create_job </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.create_job }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_create_job }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> retained_job </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.retained_job }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_retained_job }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> urban_rural </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.urban_rural }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_urban_rural }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> rev_line_cr </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.rev_line_cr }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_rev_line_cr }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> low_doc </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.low_doc }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_low_doc }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> gr_appv </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.gr_appv }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_gr_appv }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> recession </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.recession }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_recession }}</td>
+                </tr>
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2"> has_franchise </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.has_franchise }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ loan.prediction_datas.feat_imp_has_franchise }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

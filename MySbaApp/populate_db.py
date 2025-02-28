@@ -19,15 +19,15 @@ def populate_users():
 def populate_loans() :
 
     datas = []
-    datas.append( {"user_id": 2, "term" : 6,  "amount" : 50000 } )
-    datas.append( {"user_id": 2, "term" : 30,  "amount" : 50000 } )
-    datas.append( {"user_id": 2, "term" : 60, "amount" : 50000 } )
-    datas.append( {"user_id": 3, "term" : 6, "amount" : 50000 } )
-    datas.append( {"user_id": 3, "term" : 30, "amount" : 50000 } ) 
-    datas.append( {"user_id": 3, "term" : 60, "amount" : 50000 } )
-    datas.append( {"user_id": 4, "term" : 6, "amount" : 50000 } )
-    datas.append( {"user_id": 4, "term" : 30, "amount" : 50000 } ) 
-    datas.append( {"user_id": 4, "term" : 60, "amount" : 50000 } )
+    datas.append( {"user_id": 2, "term" : 6, "no_emp" : 13, "retained_job": 3, "amount" : 50000 } )
+    datas.append( {"user_id": 2, "term" : 24, "no_emp" : 13, "retained_job": 3, "amount" : 50000 } )
+    datas.append( {"user_id": 2, "term" : 12, "no_emp" : 0, "retained_job": 12,"amount" : 500000 } )
+    datas.append( {"user_id": 3, "term" : 6, "no_emp" : 13, "retained_job": 3,"amount" : 50000 } )
+    datas.append( {"user_id": 3, "term" : 30,"no_emp" : 60, "retained_job": 24, "amount" : 500000 } ) 
+    datas.append( {"user_id": 3, "term" : 60, "no_emp" : 13, "retained_job": 3,"amount" : 50000 } )
+    datas.append( {"user_id": 4, "term" : 6, "no_emp" : 13, "retained_job": 30,"amount" : 50000 } )
+    datas.append( {"user_id": 4, "term" : 30, "no_emp" : 13, "retained_job": 2,"amount" : 500000 } ) 
+    datas.append( {"user_id": 4, "term" : 60, "no_emp" : 13, "retained_job": 3,"amount" : 50000 } )
 
     loans = [] 
 
@@ -40,7 +40,7 @@ def populate_loans() :
                 loan_advisor_approval_date_utc = None,
                 name = "Simplon",
                 city = "Lille",
-                no_emp = 0, 
+                no_emp = data["no_emp"], 
                 franchise_code = 0, 
                 state = "OH", #LoanRequest.StateType.choices[0][0],
                 zip = None, 
@@ -50,9 +50,9 @@ def populate_loans() :
                 term = data["term"], 
                 naics="54", 
                 approval_date = None,   
-                approval_fy = "",
+                approval_fy = "2008",
                 create_job = 0,
-                retained_job = 3,
+                retained_job = data["retained_job"],
                 rev_line_cr = "N", # LoanRequest.RevLineCrType.choices[0][0], 
                 low_doc = "N", #LoanRequest.LowDocType.choices[0][0],
                 chg_off_date = None,
