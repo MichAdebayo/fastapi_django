@@ -1,4 +1,4 @@
-from django.shortcuts import redirect #, render
+from django.shortcuts import redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import LoginView
@@ -7,30 +7,31 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, ListView, FormView, DetailView
 from .models import UserProfile, LoanRequest #, Job, ContactMessage, PredictionHistory, Appointment,Availability, 
-from .forms import UserSignupForm, UserProfileForm, LoanRequestForm #, ApplicationForm, ChangePasswordForm, PredictChargesForm, AppointmentForm
-# from django.http import HttpResponse
-import random
-# from django.http import JsonResponse
+from .forms import UserSignupForm, UserProfileForm, LoanRequestForm, AdminAuthenticationForm, AdminProfileForm # ChangePasswordForm, PredictChargesForm, AppointmentForm
+from django.http import HttpResponseRedirect
+from django.contrib.auth import get_user_model,logout, login 
+from django.shortcuts import get_object_or_404
+import requests, logging # random
+from django.http import JsonResponse
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.forms import AuthenticationForm
 # import json
-# from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import get_user_model, login #logout, 
+from django.views.decorators.csrf import csrf_exempt
 # from django.conf import settings
 # from django.views import View 
-# import pandas as pd
-# import os
 # from django.contrib.admin.views.decorators import staff_member_required
 # from django.db.models import Avg
-# from django.contrib.auth.decorators import login_required
-# from django.utils import timezone
-import requests
-import logging
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 
 
-logger = logging.getLogger(__name__)
+
+
 
 class HomeView(TemplateView):
-
     template_name = 'sbapp/home.html'  # Home Page View Template
 
 
@@ -39,62 +40,40 @@ class SignupView(CreateView):
     model = UserProfile
     form_class = UserSignupForm
     template_name = 'sbapp/signup.html'
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('user_login')
 
 
 class UserLoginView(LoginView):
-
-    template_name = 'sbapp/login.html'
+    template_name = 'sbapp/user_login.html'
     authentication_form = AuthenticationForm
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
 
-    def get_success_url(self):
-        return reverse_lazy('user_welcome')
-    
     def form_valid(self, form):
+        user = form.get_user()
 
-        remember_me = self.request.POST.get('remember_me', None) is not None
+        # Prevent staff or superusers from logging in through this view
+        if user.is_staff or user.is_superuser:
+            form.add_error(None, "Admins cannot log in from the user portal.")
+            return self.form_invalid(form)  # Re-render login form with error
 
+        # Handle "Remember Me" functionality
+        remember_me = self.request.POST.get("remember_me", None) is not None
         if not remember_me:
             self.request.session.set_expiry(0)  # Expire session on browser close
         else:
             self.request.session.set_expiry(1209600)  # Session lasts 2 weeks
 
-        return super().form_valid(form)
+        login(self.request, user)
+        return HttpResponseRedirect(self.get_success_url())
 
+    def get_success_url(self):
+        return reverse_lazy("user_dashboard")  # Redirect non-admin users to their dashboard
 
-class UserWelcomeView(LoginRequiredMixin, TemplateView):
-    """
-    A view to display the user's welcome dashboard.
     
-    This page provides an overview of the user's loan applications, 
-    account information, and important updates.
-    
-    Features:
-        - Displays loan application history
-        - Shows application status updates
-        - Provides access to loan requests and resources
-    """
-    template_name = 'sbapp/user_welcome.html'
+class UserDashboardView(LoginRequiredMixin, TemplateView):
 
-    # def get_context_data(self, **kwargs):
-    #     """
-    #     Adds loan application history and relevant user info to the context.
-    #     """
-    #     context = super().get_context_data(**kwargs)
-        
-        # Fetching the user's loan applications
-        # context['loan_applications'] = LoanRequest.objects.filter(username=self.request.user).order_by('-approval_date')
-        
-        # # Example notifications or messages (could be extended from a model)
-        # context['notifications'] = [
-        #     "Your latest loan request is under review.",
-        #     "Don't forget to check out our business resources!",
-        # ]
+    template_name = 'sbapp/user_dashboard.html'
 
-        # print(LoanRequest.objects.filter(username=self.request.user).exists())
-
-        # return context
     
 class UserProfileView(LoginRequiredMixin, UpdateView):
 
@@ -129,14 +108,6 @@ class LoanRequestCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
         
-    #     # Convert gr_appv to currency format
-    #     amount = form.cleaned_data.get('gr_appv')
-    #     if amount is not None:
-    #         form.instance.gr_appv = f"${amount:,.2f}"
-    #     response = super().form_valid(form)
-    #     messages.success(self.request, 'Loan request submitted successfully!')
-    #     return response
-
 class LoanRequestSuccessView(TemplateView):
     template_name = 'sbapp/user_loan_request_success.html'
 
@@ -163,26 +134,489 @@ class LoanRequestStatusView(LoginRequiredMixin, SuccessMessageMixin, FormView):
         })
         return self.render_to_response(context)
 
+
+
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and \
+               (self.request.user.is_staff or self.request.user.is_superuser)
+    
+    def handle_no_permission(self):
+        return redirect('admin_login')
+
+
+
+# _________________________________________
+#
+#  region AdminLoginView
+# _________________________________________
+ 
+
+class AdminLoginView(LoginView):
+    template_name = 'sbapp/admin_user_login.html'
+    authentication_form = AdminAuthenticationForm  
+    redirect_authenticated_user = False  
+
+    def get_success_url(self):
+        return reverse_lazy('admin_user_dashboard')
+
+    def form_valid(self, form):
+        """
+        Handle successful form submission.
+        Authenticate the user locally, fetch the JWT token from FastAPI, and store it in the session.
+        """
+        # Authenticate the user locally
+        user = form.get_user()
+
+        # Check if the user has admin privileges
+        if not user.is_staff and not user.is_superuser:
+            logout(self.request)
+            messages.error(self.request, "You don't have admin privileges")
+            return self.form_invalid(form)
+
+        # Get the email and password of the authenticated user
+        email = user.email
+        password = form.cleaned_data['password']
+
+        # Authenticate with the FastAPI /auth/login endpoint
+        try:
+            fastapi_url = "http://127.0.0.1:8000/auth/login"
+            auth_data = {
+                "email": email,
+                "password": password,
+            }
+            response = requests.post(fastapi_url, json=auth_data)
+
+            # Check if the request was successful
+            if response.status_code == 200:
+                # Extract the JWT token from the response
+                token_data = response.json()
+                jwt_token = token_data.get("access_token")
+
+                if not jwt_token:
+                    messages.error(self.request, "Failed to retrieve JWT token from the prediction service.")
+                    return self.form_invalid(form)
+
+                # Store the token in the session
+                self.request.session["jwt_token"] = jwt_token
+            else:
+                # Handle failed authentication with FastAPI
+                error_message = response.json().get("detail", "Unknown error")
+                messages.error(self.request, f"Failed to authenticate with the prediction service: {error_message}")
+                return self.form_invalid(form)
+        except requests.RequestException as e:
+            # Handle network-related errors (e.g., FastAPI server is down)
+            messages.error(self.request, f"Network error during authentication: {str(e)}")
+            return self.form_invalid(form)
+        except Exception as e:
+            # Handle unexpected exceptions
+            messages.error(self.request, f"Unexpected error during authentication: {str(e)}")
+            return self.form_invalid(form)
+
+        # Set session expiry based on "Remember Me"
+        if self.request.POST.get('remember_me'):
+            self.request.session.set_expiry(1209600)  # 2 weeks
+        else:
+            self.request.session.set_expiry(0)  # Session expires when browser is closed
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """
+        Add additional context data for the template.
+        """
+        context = super().get_context_data(**kwargs)
+        context['is_admin_login'] = True
+        return context
+    
+
+# _________________________________________
+#
+#  region AdminDashboardView
+# _________________________________________
+
+class AdminDashboardView(AdminRequiredMixin, TemplateView):
+    template_name = 'sbapp/admin_user_dashboard.html'
+
+
+# _________________________________________
+#
+#  region AdminProfileView
+# _________________________________________
+
+class AdminProfileView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = UserProfile
+    form_class = AdminProfileForm
+    template_name = "sbapp/admin_user_profile.html"
+    success_url = reverse_lazy("admin_user_profile")
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.save()
+        messages.success(self.request, "Profile updated successfully!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "There was an error updating your profile. Please check your inputs.")
+        return super().form_invalid(form)
+
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+    
+
+# _________________________________________
+#
+#  region SimpleView
+# _________________________________________
+from django.views import View
+from django.shortcuts import render
+from .models import LoanRequest
+
+# Configure logger
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('sbapp.views')
+
+class SimpleDataView(View):
+    def get(self, request, *args, **kwargs):
+        # Fetch the first loan request for simplicity
+        try:
+            loan = LoanRequest.objects.first()
+            if loan:
+                api_data = loan.to_api_data()  # Use the to_api_data method from the model
+                
+                # Fetch token from FastAPI
+                token = self.get_jwt_token()
+                
+                # Send data to prediction endpoint
+                prediction_result = self.send_to_prediction_endpoint(api_data, token)
+                
+                return render(request, 'sbapp/simple_data.html', {'api_data': api_data, 'token': token, 'prediction_result': prediction_result})
+            else:
+                return render(request, 'sbapp/simple_data.html', {'api_data': None, 'token': None, 'prediction_result': None})
+        except Exception as e:
+            print(f"Exception: {str(e)}")
+            return render(request, 'sbapp/simple_data.html', {'api_data': None, 'token': None, 'prediction_result': None})
+
+    def get_jwt_token(self):
+        """
+        Retrieve the JWT token by authenticating with FastAPI's /auth/login endpoint.
+        """
+        try:
+            # Define the FastAPI login endpoint URL
+            fastapi_login_url = "http://127.0.0.1:8000/auth/login"
+            
+            # Replace these with actual credentials or retrieve them from a secure source
+            credentials = {
+                "email": "mike@test.com",
+                "password": "obitochan"
+            }
+            
+            response = requests.post(fastapi_login_url, json=credentials)
+            
+            if response.status_code == 200:
+                token = response.json().get('access_token')
+                logger.info(f"Token retrieved successfully: {token}")
+                return token
+            else:
+                logger.error(f"Failed to retrieve token. Status code: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            logger.error(f"Error during token retrieval: {str(e)}")
+            print(f"Exception: {str(e)}")
+            return None
+
+    def send_to_prediction_endpoint(self, api_data, token):
+            """
+            Send the formatted data and token to the FastAPI prediction endpoint.
+            """
+            try:
+                if not token:
+                    logger.error("No token available.")
+                    return None
+                
+                # Define the FastAPI prediction endpoint URL
+                fastapi_prediction_url = "http://127.0.0.1:8000/loans/request"
+                
+                headers = {
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                }
+
+                print(f"Sending data to prediction endpoint: {api_data}")
+                response = requests.post(fastapi_prediction_url, json=api_data, headers=headers)
+                print(f"Response status code: {response.status_code}")
+                print(f"Response content: {response.content}")
+                
+                if response.status_code == 200:
+                    response_json = response.json()  # Decode the byte string into a Python dictionary
+                    print(f"Response JSON: {response_json}")  # Print the full JSON response
+                    prediction_result = response_json.get('approval_status')  # Extract the approval_status field
+                    logger.info(f"Prediction result received: {prediction_result}")
+                    return prediction_result
+                else:
+                    logger.error(f"Failed to get prediction. Status code: {response.status_code}, Response: {response.text}")
+                    return None
+            except Exception as e:
+                logger.error(f"Error during prediction: {str(e)}")
+                print(f"Exception: {str(e)}")
+                return None
+# _________________________________________
+#
+#  region AdminLoanRequestView
+# _________________________________________
+
+import requests
+import json
+
+def get_jwt_token(request):
+    """Retrieve JWT token from session or authenticate."""
+    if 'jwt_token' in request.session:
+        print("JWT Token retrieved from session:", request.session['jwt_token'])
+        return request.session['jwt_token']
+
+    response = requests.post(
+        'http://localhost:8000/auth/login',
+        json={'email': 'mike@test.com', 'password': 'obitochan'}
+    )
+    
+    if response.status_code == 200:
+        token = response.json().get('access_token')
+        print("JWT Token retrieved from login:", token)
+        request.session['jwt_token'] = token
+        return token
+    else:
+        print("Failed to retrieve JWT token:", response.status_code, response.content)
+    return None
+
+def send_api_request(url, method, data=None, headers=None, max_retries=3):
+    """Send API request with retry mechanism."""
+    for attempt in range(max_retries):
+        try:
+            if method == 'GET':
+                response = requests.get(url, headers=headers)
+            elif method == 'POST':
+                print("Sending POST request with data:", data)
+                print("Sending POST request with headers:", headers)
+                response = requests.post(url, json=data, headers=headers)
+            
+            if response.status_code == 200:
+                print("Response content:", response.json())
+                return response.json()
+            else:
+                print(f"Attempt {attempt + 1}: Failed with status code {response.status_code}")
+                print("Response content:", response.text)
+                if attempt < max_retries - 1:
+                    print("Retrying...")
+                else:
+                    print("Max retries reached. Exiting.")
+                    return None
+        except requests.exceptions.RequestException as e:
+            print(f"Attempt {attempt + 1}: Request failed with exception: {e}")
+            if attempt < max_retries - 1:
+                print("Retrying...")
+            else:
+                print("Max retries reached. Exiting.")
+                return None
+
+    return None
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.list import ListView
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.utils import timezone
+from .models import LoanRequest
+import json
+
+class AdminLoanRequestView(LoginRequiredMixin, ListView):
+    model = LoanRequest
+    template_name = 'sbapp/admin_user_loan_request.html'
+    context_object_name = 'loan_applications'
+
+    def get_queryset(self):
+        return LoanRequest.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add status counts
+        context['pending_loans_count'] = LoanRequest.objects.filter(loan_status='Pending').count()
+        context['approved_loans_count'] = LoanRequest.objects.filter(loan_status='Approved').count()
+        context['rejected_loans_count'] = LoanRequest.objects.filter(loan_status='Rejected').count()
+        
+        # Enhance loan objects with view state
+        for loan in context['loan_applications']:
+            if loan.loan_status == 'Pending':
+                loan.view_state = 'INITIAL'
+                loan.custom_status = 'Pending'
+                #loan.last_updated = 'No prediction yet'
+            else:
+                loan.view_state = 'FINAL'
+                loan.custom_status = self.get_custom_status(loan.loan_status)
+                #loan.last_updated = loan.updated_at_utc
+        
+        return context
+
+    def post(self, request, *args, **kwargs):
+        predict_id = request.POST.get('predict_id')
+        update_id = request.POST.get('update_id')
+        status = request.POST.get('status')
+
+        if predict_id:
+            self.handle_prediction(predict_id, request)
+        elif update_id and status:
+            self.handle_status_update(update_id, status, request)
+
+        return JsonResponse({'success': True})
+
+    def handle_prediction(self, loan_id, request):
+        loan = LoanRequest.objects.filter(loan_nr_chk_dgt=loan_id).first()
+        if not loan:
+            return JsonResponse({'error': 'Loan not found'}, status=404)
+
+        token = get_jwt_token(request)
+        if not token:
+            return JsonResponse({'error': 'Failed to retrieve JWT token'}, status=400)
+
+        api_data = loan.to_api_data()
+        headers = {'Authorization': f'Bearer {token}'}
+
+        if response := send_api_request(
+            'http://localhost:8000/loans/request',
+            'POST',
+            data=api_data,
+            headers=headers,
+        ):
+            print("API Response:", response)
+            if approval_status := response.get('approval_status'):
+                if approval_status.lower() == 'approve':
+                    loan.loan_status = 'Approved'
+                elif approval_status.lower() == 'reject':
+                    loan.loan_status = 'Rejected'
+                else:
+                    loan.loan_status = 'Pending'
+                #loan.updated_at_utc = timezone.now()
+                loan.save()
+
+                # Update loan object with new status
+                loan.custom_status = self.get_custom_status(approval_status)
+                #loan.last_updated = loan.updated_at_utc
+            else:
+                self._extracted_from_handle_prediction_31(loan)
+        else:
+            self._extracted_from_handle_prediction_31(loan)
+        return JsonResponse({'success': True})
+
+    def _extracted_from_handle_prediction_31(self, loan):
+        # Handle API errors
+        loan.view_state = 'ERROR'
+        loan.custom_status = 'Prediction failed'
+        loan.save()
+
+    def handle_status_update(self, loan_id, new_status, request):
+        loan = LoanRequest.objects.filter(loan_nr_chk_dgt=loan_id).first()
+        if not loan:
+            return JsonResponse({'error': 'Loan not found'}, status=404)
+
+        if new_status not in ['Pending', 'Approved', 'Rejected']:
+            return JsonResponse({'error': 'Invalid status'}, status=400)
+
+        loan.loan_status = new_status
+        #loan.updated_at_utc = timezone.now()
+        loan.save()
+
+        # Update loan object with new status
+        loan.custom_status = self.get_custom_status(new_status)
+        #loan.last_updated = loan.updated_at_utc
+
+        return JsonResponse({'success': True})
+
+    @staticmethod
+    def get_custom_status(status):
+        match status:
+            case 'Approved': 
+                return 'Will be fully repaid'
+            case 'Rejected': 
+                return 'Will default on repayment'
+            case _:
+                return 'Pending'
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import LoanRequest
+
+@csrf_exempt
+def update_loan_status(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    update_id = request.POST.get('update_id')
+    status = request.POST.get('status')
+
+    loan = LoanRequest.objects.filter(loan_nr_chk_dgt=update_id).first()
+    if not loan:
+        return JsonResponse({'error': 'Loan not found'}, status=404)
+
+    if status not in ['Pending', 'Approved', 'Rejected']:
+        return JsonResponse({'error': 'Invalid status'}, status=400)
+
+    loan.loan_status = status
+    loan.updated_at_utc = timezone.now()
+    loan.save()
+
+    return JsonResponse({'success': True})
+
+
+#_________________________________________
+#  region AboutView
+# _________________________________________
 class AboutView(TemplateView):
     template_name = 'sbapp/about.html'  # About Us View Template
 
+# _________________________________________
+#
+#  region ServicesView
+# _________________________________________
 class ServicesView(TemplateView):
     template_name = 'sbapp/services.html'  # Services View Template
 
+# _________________________________________
+#
+#  region BlogView
+# _________________________________________
 class BlogView(TemplateView):
     template_name = 'sbapp/blog.html'  # Blog View Template
 
+# _________________________________________
+#
+#  region TestimonialView
+# _________________________________________
 class TestimonialView(TemplateView):
     template_name = 'sbapp/testimonial.html'  # Testimonial View Template
 
+# _________________________________________
+#
+#  region ContactView
+# _________________________________________
 class ContactView(TemplateView):
     template_name = 'sbapp/contact.html'  # Contact View Template
 
+# _________________________________________
+#
+#  region ContactSupportView
+# _________________________________________
 class ContactSupportView(TemplateView):
     template_name = 'sbapp/contact_support.html'  # User Contact View Template
 
-from django.views.generic import TemplateView
-
+# _________________________________________
+#
+#  region WorkshopsView
+# _________________________________________
 class WorkshopsView(TemplateView):
     template_name = 'sbapp/workshops.html'
 
@@ -210,32 +644,10 @@ class WorkshopsView(TemplateView):
         ]
         return context
     
-
-# class LoanStatusView(LoginRequiredMixin, TemplateView):
-#     """
-#     A view to check the status of a user's loan applications.
-
-#     Displays the submitted applications and their current approval status.
-    
-#     Features:
-#         - Shows pending, approved, and rejected applications
-#         - Displays approval dates and financial details
-#     """
-#     template_name = "sbapp/user_loan_status.html"
-
-#     def get_context_data(self, **kwargs):
-#         """
-#         Fetches loan applications and adds them to the context.
-#         """
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user
-
-#         # Retrieve all loan applications for the logged-in user
-#         context['loan_applications'] = LoanRequest.objects.filter(user=user).order_by('-approval_date')
-
-#         return context
-    
-
+# _________________________________________
+#
+#  region BusinessResourcesView
+# _________________________________________
 class BusinessResourcesView(LoginRequiredMixin, TemplateView):
     """
     A view providing users with business resources and guides.
@@ -262,6 +674,33 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
         ]
 
         return context
+    
+# class LoanStatusView(LoginRequiredMixin, TemplateView):
+#     """
+#     A view to check the status of a user's loan applications.
+
+#     Displays the submitted applications and their current approval status.
+    
+#     Features:
+#         - Shows pending, approved, and rejected applications
+#         - Displays approval dates and financial details
+#     """
+#     template_name = "sbapp/user_loan_status.html"
+
+#     def get_context_data(self, **kwargs):
+#         """
+#         Fetches loan applications and adds them to the context.
+#         """
+#         context = super().get_context_data(**kwargs)
+#         user = self.request.user
+
+#         # Retrieve all loan applications for the logged-in user
+#         context['loan_applications'] = LoanRequest.objects.filter(user=user).order_by('-approval_date')
+
+#         return context
+    
+
+
 
 
 
@@ -449,86 +888,6 @@ class BusinessResourcesView(LoginRequiredMixin, TemplateView):
 #         except ContactMessage.DoesNotExist:
 #             return JsonResponse({'success': False, 'error': 'Message not found.'}, status=404)
 #     return JsonResponse({'success': False, 'error': 'Invalid request method.'}, status=400)
-
-
-# def predict_charges(request):
-#     """
-#     Predicts insurance charges based on user input.
-
-#     This view handles both GET and POST requests:
-#     - GET: Renders the insurance form.
-#     - POST: Processes user input, loads a pre-trained model, makes a prediction, 
-#       and returns the predicted insurance charge as a JSON response.
-
-#     Args:
-#         request (HttpRequest): The HTTP request object.
-
-#     Returns:
-#         HttpResponse:
-#             - If GET: Renders the 'insurance_form.html' template.
-#             - If POST: Returns a JSON response with the predicted insurance charge.
-#             - If an error occurs: Returns a JSON response with an error message and status 400.
-#             - If the request method is invalid: Returns a JSON response with status 405.
-
-#     Raises:
-#         - Handles exceptions gracefully and returns an error message if prediction fails.
-#     """
-#     prediction = None
-
-#     # Handle the GET request - Render the form
-#     if request.method == 'GET':
-#         return render(request, 'insurance_app/insurance_form.html', {'prediction': prediction})
-
-#     # Handle the POST request - Process the form data and predict
-#     elif request.method == 'POST':
-#         try:
-#             # Parse the JSON data from the request body
-#             data = json.loads(request.body)
-
-#             # Extract data from the JSON
-#             height = float(data.get('height'))
-#             weight = float(data.get('weight'))
-#             age = int(data.get('age'))
-#             sex = data.get('sex')
-#             smoker = data.get('smoker')
-#             region = data.get('region')
-#             children = int(data.get('children'))
-#             bmi = float(data.get('bmi'))
-#             bmi_category = data.get('bmi_category')
-
-#             # Load model from pickle
-#             model_path = 'insurance_app/model/model_1.pickle'
-#             with open(model_path, 'rb') as file:
-#                 model = pickle.load(file)
-
-#             # Prepare data as a DataFrame (ensure the order matches your model's expected input)
-#             input_data = pd.DataFrame([{
-#                 'height': height,
-#                 'weight': weight,
-#                 'age': age,
-#                 'sex': sex,
-#                 'smoker': smoker,
-#                 'region': region,
-#                 'children': children,
-#                 'bmi': bmi,
-#                 'BMI_category': bmi_category
-#             }])
-
-#             # Make the prediction
-#             prediction = round(model.predict(input_data)[0], 2)
-
-#             # Ensure prediction is non-negative
-#             prediction = max(prediction, 0)
-
-#             # Return prediction as JSON response
-#             return JsonResponse({'prediction': prediction})
-
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=400)
-
-#     # If not GET or POST, return an error
-#     return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 
 
 # @login_required

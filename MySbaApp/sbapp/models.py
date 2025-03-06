@@ -52,7 +52,7 @@ class LoanRequest(models.Model):
     name = models.CharField(max_length=255, blank=True, help_text="Full Name of the Enterprise")
     
     ### 🔹 City where enterprise is located ###
-    city = models.CharField(max_length=255)
+    city = models.CharField(max_length=255, blank=True, help_text="City where enterprise is located")
     
     ### 🔹 Number of Employees ###
     no_emp = models.PositiveSmallIntegerField(default=1, help_text="Number of employees")
@@ -248,16 +248,26 @@ class LoanRequest(models.Model):
         """Return DisbursementDate formatted as DD-MMM-YY"""
         return self.disbursement_date.strftime("%d-%b-%y") if self.disbursement_date else None 
 
+
     ### 🔹 Currency Fields ###
-    # Using DecimalFields to store monetary values accurately.
-    disbursement_gross = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Amount disbursed")
-    balance_gross = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Gross amount outstanding")
-    chg_off_prin_gr = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Charged-off amount")
-    gr_appv = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Gross amount of loan approved by bank")
-    sba_appv = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="SBA’s guaranteed amount of approved loan")
+    disbursement_gross = models.CharField(
+        max_length=20, null=True, blank=True, help_text="Amount disbursed"
+    )
+    balance_gross = models.CharField(
+        max_length=20, null=True, blank=True, help_text="Gross amount outstanding"
+    )
+    chg_off_prin_gr = models.CharField(
+        max_length=20, null=True, blank=True, help_text="Charged-off amount"
+    )
+    gr_appv = models.CharField(
+        max_length=20, null=True, blank=True, help_text="Gross amount of loan approved by bank"
+    )
+    sba_appv = models.CharField(
+        max_length=20, null=True, blank=True, help_text="SBA’s guaranteed amount of approved loan"
+    )
     loan_status = models.CharField(max_length=15, default='Pending')
 
-    # Derived Field: Recession status
+    ### Derived Fields ###
     @property
     def recession(self):
         """Determines if the loan was active during the recession period."""
@@ -266,8 +276,7 @@ class LoanRequest(models.Model):
         if self.approval_date and recession_start <= self.approval_date <= recession_end:
             return 1
         return 0
-    
-    # Derived Field: Franchise status
+
     @property
     def has_franchise(self):
         """Determines if an enterprise is a franchise or not."""
@@ -277,22 +286,48 @@ class LoanRequest(models.Model):
             return 0
         return 1 if code > 1 else 0
 
+    ### Helper Methods ###
     def format_currency(self, value):
-        """Convert a numeric value to a formatted currency string."""
-        if value is None or value == "":
+        """
+        Convert a numeric value (int/float) into a formatted currency string.
+        e.g., 12345.67 -> "$12,345.67"
+        Returns None if invalid.
+        """
+        if value is None:
             return None
         try:
             return f"${float(value):,.2f}"
         except Exception:
-            return value
-
-    def clean_numeric(self, value):
-        """Convert a currency string back to a float (removes '$' and ',')."""
-        if value is None or value == "":
             return None
-        return float(value.replace("$", "").replace(",", ""))
+        
+    def clean_numeric(self, value):
+        """
+        Convert a formatted currency string back to a float.
+        e.g., "$12,345.67" -> 12345.67
+        Returns None if invalid.
+        """
+        if not value:
+            return None
+        try:
+            return float(value.replace("$", "").replace(",", ""))
+        except Exception:
+            return None
 
-    # Consolidated save() method
+
+    def export_as_integer(self, value):
+        """
+        Convert a numeric value into an integer without decimals.
+        e.g., 12345.67 -> 1234567
+        Returns None if invalid.
+        """
+        if value is None:
+            return None
+        try:
+            return int(float(value))
+        except Exception:
+            return None
+
+    ### Overridden Save Method ###
     def save(self, *args, **kwargs):
         # Auto-generate LoanNr_ChkDgt if not provided.
         if not self.loan_nr_chk_dgt:
@@ -307,161 +342,84 @@ class LoanRequest(models.Model):
         if self.bank and isinstance(self.bank, str):
             self.bank = self.bank.upper()
 
+        # Convert date fields if provided as strings.
+        if self.approval_date and isinstance(self.approval_date, str):
+            with contextlib.suppress(Exception):
+                self.approval_date = datetime.strptime(self.approval_date, "%d-%b-%y").date()
+        if self.disbursement_date and isinstance(self.disbursement_date, str):
+            with contextlib.suppress(Exception):
+                self.disbursement_date = datetime.strptime(self.disbursement_date, "%d-%b-%y").date()
+
+        # Process currency fields.
+        for field_name in [
+            "disbursement_gross",
+            "balance_gross",
+            "chg_off_prin_gr",
+            "gr_appv",
+            "sba_appv",
+        ]:
+            value = getattr(self, field_name)
+            numeric_value = self.clean_numeric(value)  # Clean input to numeric
+            if numeric_value is not None:
+                setattr(self, field_name, self.format_currency(numeric_value))  # Format as currency string
+
         super().save(*args, **kwargs)
-    
+
+    ### API Export Method ###
+    def to_api_data(self):
+        """
+        Export the model data for API validation.
+        Converts currency fields to integers and ensures all fields are properly formatted.
+        """
+        # Helper function to convert RevLineCr and LowDoc to integer (1 for 'Y', 0 for 'N' or None)
+        def convert_yes_no_to_int(value):
+            if value == "Y":
+                return 1
+            elif value == "N" or value is None:
+                return 0
+            return None
+
+        # Helper function to convert UrbanRural to integer (1 for Urban, 2 for Rural, 0 for default/invalid)
+        def convert_urban_rural_to_int(value):
+            if value == "1":
+                return 1
+            elif value == "2":
+                return 2
+            return 0
+
+        def convert_naics_to_int(value):
+            if value.isdigit():
+                return int(str(value)[:2])  # Convert to string, slice, then back to int
+            raise ValueError("Invalid NAICS code: must be a numeric string")  # Handle invalid input
+
+        def new_exists_to_int(value):
+            return int(float(value)) if value and str(value).replace('.','',1).isdigit() else 0
+
+        # Construct the API data dictionary
+        api_data = {
+            "state": self.state.upper() if self.state else None,  # Ensure state is uppercase
+            "bank": self.bank.upper() if self.bank else None,  # Ensure bank name is uppercase
+            "naics": convert_naics_to_int(self.naics),  # Safely convert NAICS to integer
+            "term": self.term or 0,  # Default to 0 if term is missing
+            "no_emp": self.no_emp or 0,  # Default to 0 if no_emp is missing
+            "new_exist": new_exists_to_int(self.new_exist),  # Default to 0 if no_emp is missing
+            "create_job": self.create_job or 0,  # Default to 0 if create_job is missing
+            "retained_job": self.retained_job or 0,  # Default to 0 if retained_job is missing
+            "urban_rural": convert_urban_rural_to_int(self.urban_rural),  # Convert UrbanRural to integer
+            "rev_line_cr": convert_yes_no_to_int(self.rev_line_cr),  # Convert RevLineCr to integer
+            "low_doc": convert_yes_no_to_int(self.low_doc),  # Convert LowDoc to integer
+            "gr_appv": self.export_as_integer(self.clean_numeric(self.gr_appv)),  # Convert GrAppv to integer
+            "recession": self.recession or random.randint(0,1),  # Use the derived property for recession status
+            "has_franchise": self.has_franchise,  # Use the derived property for franchise status
+        }
+
+        return api_data
+        
+
     def __str__(self):
         return self.loan_nr_chk_dgt
-
-
-
-#     # # ### 🔹 Enterprise's NAICS Code ###
-#     # naics = models.CharField(default="0", blank=True, max_length=6, help_text="North American Industry Classification System Code")
-
-#     ### 🔹 Loan Approval Date (stored as DateField; display in dd-MMM-yy format) ###
-#     # approval_date = models.DateField(null=True, blank=True, help_text="Date SBA commitment issued")
-    
-#     # def get_approval_date_formatted(self):
-#     #     """Return ApprovalDate formatted as DD-MMM-YY (e.g., '28-Feb-89')"""
-#     #     return self.approval_date.strftime("%d-%b-%y") if self.approval_date else None
-
-#     ### 🔹 Loan Approval Fiscal Year ###
-#     # @staticmethod
-#     # def get_year_choices():
-#     #     """Generate a list of years from 1980 to the current year + 1."""
-#     #     return [(str(year), str(year)) for year in range(1980, datetime.now().year + 2)]
-    
-#     # approval_fy = models.CharField(
-#     #     choices=get_year_choices(),
-#     #     null=True,
-#     #     blank=True,
-#     #     max_length=4,
-#     #     help_text="Fiscal Year of commitment"
-#     # )
-
-
-
     
 
-
-#     # ### 🔹 Jobs Created / Retained ###
-#     # create_job = models.PositiveIntegerField(default=0, help_text="Number of jobs created")
-#     # retained_job = models.PositiveIntegerField(default=0, help_text="Number of jobs retained")
-    
-
-
-#     ### 🔹 Enterprise Class Type (Urban/Rural) ###
-#     # class UrbanRuralType(models.TextChoices):
-#     #     URBAN = '1', 'Urban'
-#     #     RURAL = '2', 'Rural'
-#     # urban_rural = models.CharField(blank=True, max_length=1, choices=UrbanRuralType.choices, default='0', )
-
-#     ### 🔹 Loan Class (Revolving Line of Credit vs. Not) ###
-#     # class RevLineCrType(models.TextChoices):
-#     #     YES = 'Y', 'Yes'
-#     #     NO = 'N', 'No'
-#     # rev_line_cr = models.CharField(blank=True, null=True, choices=RevLineCrType.choices, max_length=1, help_text="Revolving line of credit")
-
-#     # ### 🔹 Documentation Type (LowDoc vs. Heavy Doc) ###
-#     # class LowDocType(models.TextChoices):
-#     #     YES = 'Y', 'Yes'
-#     #     NO = 'N', 'No'
-#     # low_doc = models.CharField(blank=True, null=True, choices=LowDocType.choices, max_length=1, help_text="LowDoc Loan Program")
-
-#     ### 🔹 Default Date (e.g., charged off date) ###
-#     # chg_off_date = models.DateField(null=True, blank=True, help_text="Date when loan is declared in default")
-
-#     ### 🔹 Disbursement Date (stored as DateField; display in dd-MMM-yy format) ###
-#     # disbursement_date = models.DateField(null=True, blank=True, help_text="Disbursement date")
-    
-#     # def get_disbursement_date_formatted(self):
-#     #     """Return DisbursementDate formatted as DD-MMM-YY"""
-#     #     return self.disbursement_date.strftime("%d-%b-%y") if self.disbursement_date else None 
-
-#     ### 🔹 Currency Fields ###
-#     # currency_regex = RegexValidator(
-#     #     regex=r'^\$?\d{1,3}(,\d{3})*(\.\d{2})?$',
-#     #     message="Enter a valid currency amount (e.g., 1,000.00 or 100.50)."
-#     # )
-#     # disbursement_gross = models.CharField(null=True, blank=True, max_length=10, validators=[currency_regex], help_text="Amount disbursed")
-#     # balance_gross = models.CharField(null=True, blank=True, max_length=20, validators=[currency_regex], help_text="Gross amount outstanding")
-#     # chg_off_prin_gr = models.CharField(null=True, blank=True, max_length=20, validators=[currency_regex], help_text="Charged-off amount")
-#     # gr_appv = models.CharField(null=True, blank=True, max_length=20, validators=[currency_regex], help_text="Gross amount of loan approved by bank")
-#     # sba_appv = models.CharField(null=True, blank=True, max_length=20, validators=[currency_regex], help_text="SBA’s guaranteed amount of approved loan")
-#     # loan_status = models.CharField(max_length=15, default='Pending')
-
-#     # Derived Field
-#     # @property
-#     # def recession(self):
-#     #     """Determines if the loan was active during the recession period."""
-#     #     recession_start = date(2007, 12, 1)
-#     #     recession_end = date(2009, 6, 30)
-#     #     if self.approval_date and recession_start <= self.approval_date <= recession_end:
-#     #         return 1
-#     #     return 0
-    
-#     # Derived Field
-#     # @property
-#     # def has_franchise(self):
-#     #     """Determines if an enterprise is a franchise or not."""
-#     #     try:
-#     #         code = int(self.franchise_code)
-#     #     except (ValueError, TypeError):
-#     #         # If conversion fails, consider it not a franchise.
-#     #         return 0
-
-#     #     # If the code is greater than 1, it's considered a franchise.
-#     #     return 1 if code > 1 else 0
-
-#     # def format_currency(self, value):
-#     #     """Convert a numeric value (int/float) to a formatted currency string."""
-#     #     if value is None or value == "":
-#     #         return None
-#     #     try:
-#     #         return f"${float(value):,.2f}"
-#     #     except Exception:
-#     #         return value  # Return as-is if conversion fails
-
-#     # def clean_numeric(self, value):
-#     #     """Convert a currency string back to a float (removes '$' and ',')."""
-#     #     if value is None or value == "":
-#     #         return None
-#     #     return float(value.replace("$", "").replace(",", ""))
-    
-
-#     # --- Consolidated save() method ---
-#     def save(self, *args, **kwargs):
-#         # 1. Auto-generate LoanNr_ChkDgt if not provided.
-#         if not self.loan_nr_chk_dgt:
-#             loan_suffix = str(random.randint(100000, 999999))
-#             self.loan_nr_chk_dgt = f"{self.PREFIX}{loan_suffix}"
-
-#         # 2. Convert text fields to uppercase.
-#         if self.name and isinstance(self.name, str):
-#             self.name = self.name.upper()
-#         if self.city and isinstance(self.city, str):
-#             self.city = self.city.upper()
-#         if self.bank and isinstance(self.bank, str):
-#             self.bank = self.bank.upper()
-
-#         # 3. Convert date fields if provided as strings.
-#         # if self.ApprovalDate and isinstance(self.approval_date, str):
-#         #     with contextlib.suppress(Exception):
-#         #         self.ApprovalDate = datetime.strptime(self.approval_date, "%d-%b-%y").date()
-#         # if self.disbursement_date and isinstance(self.disbursement_date, str):
-#         #     with contextlib.suppress(Exception):
-#         #         self.disbursement_date = datetime.strptime(self.disbursement_date, "%d-%b-%y").date()
-#         # # 4. Format currency fields.
-#         # self.disbursement_gross = self.format_currency(self.clean_numeric(self.disbursement_gross))
-#         # self.balance_gross = self.format_currency(self.clean_numeric(self.balance_gross))
-#         # self.chg_off_prin_gr = self.format_currency(self.clean_numeric(self.chg_off_prin_gr))
-#         # self.gr_appv = self.format_currency(self.clean_numeric(self.gr_appv))
-#         # self.sba_appv = self.format_currency(self.clean_numeric(self.sba_appv))
-
-#         super().save(*args, **kwargs)
-    
-#     def __str__(self):
-#         return self.username
-    
 # class Messages(models.Model):
 
 #     name = models.CharField(max_length=255)

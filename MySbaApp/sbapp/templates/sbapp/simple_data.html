@@ -1,0 +1,50 @@
+{% extends 'sbapp/base.html' %}
+{% block content %}
+<div class="p-6 max-w-7xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Loan Data</h1>
+        <p class="text-lg text-gray-600">Click the button to display formatted loan data, token, and prediction result.</p>
+    </div>
+
+    <button id="showDataButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Show Formatted Data, Token, and Prediction Result
+    </button>
+
+    <div id="dataContainer" style="display:none;">
+        <h2 class="mt-4">Formatted Loan Information:</h2>
+        <ul>
+            <li><strong>State:</strong> {{ api_data.state }}</li>
+            <li><strong>Bank:</strong> {{ api_data.bank }}</li>
+            <li><strong>NAICS:</strong> {{ api_data.naics }}</li>
+            <li><strong>Term:</strong> {{ api_data.term }}</li>
+            <li><strong>No Emp:</strong> {{ api_data.no_emp }}</li>
+            <li><strong>New Exist:</strong> {{ api_data.new_exist }}</li>
+            <li><strong>Create Job:</strong> {{ api_data.create_job }}</li>
+            <li><strong>Retained Job:</strong> {{ api_data.retained_job }}</li>
+            <li><strong>Urban Rural:</strong> {{ api_data.urban_rural }}</li>
+            <li><strong>Rev Line Cr:</strong> {{ api_data.rev_line_cr }}</li>
+            <li><strong>Low Doc:</strong> {{ api_data.low_doc }}</li>
+            <li><strong>Gr Appv:</strong> {{ api_data.gr_appv }}</li>
+            <li><strong>Recession:</strong> {{ api_data.recession }}</li>
+            <li><strong>Has Franchise:</strong> {{ api_data.has_franchise }}</li>
+        </ul>
+        
+        <h2 class="mt-4">Token:</h2>
+        <p>{{ token }}</p>
+        
+        <h2 class="mt-4">Prediction Result:</h2>
+        <p>{{ prediction_result }}</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const showDataButton = document.getElementById('showDataButton');
+        const dataContainer = document.getElementById('dataContainer');
+
+        showDataButton.addEventListener('click', () => {
+            dataContainer.style.display = 'block';
+        });
+    });
+</script>
+{% endblock %}
