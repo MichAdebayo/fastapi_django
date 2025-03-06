@@ -5,7 +5,8 @@ from .models import LoanRequest, UserProfile
 from django.contrib.auth.hashers import make_password
 # from django.forms import DateInput
 # # from .models import Appointment
-
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
 
 class UserSignupForm(forms.ModelForm):
 
@@ -42,6 +43,7 @@ class UserLoginForm(forms.Form):
         widget=forms.PasswordInput, label="Password"
     )  # Password field with hidden input
 
+
 class UserProfileForm(forms.ModelForm):
 
     class Meta:
@@ -54,26 +56,41 @@ class LoanRequestForm(forms.ModelForm):
     class Meta:
         model = LoanRequest
         fields = [
-            'state', 'bank', 'naics', 'term', 'no_emp',
+            'name', 'city', 'state', 'zip', 'bank', 'bank_state', 'naics', 'term', 'no_emp',
             'new_exist', 'create_job', 'retained_job', 'urban_rural', 
             'rev_line_cr', 'low_doc', 'gr_appv', 'franchise_code',
             ]
 
-        # State : str
-        # Bank : str
-        # NAICS : int
-        # Term : int
-        # NoEmp : int
-        # NewExist : int
-        # CreateJob : int
-        # RetainedJob: int
-        # UrbanRural: int
-        # RevLineCr: int
-        # LowDoc: int
-        # GrAppv: int
-        # Recession: int
-        # HasFranchise: int
+class AdminAuthenticationForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.is_staff and not user.is_superuser:
+            raise ValidationError(
+                "This account doesn't have admin access.",
+                code='no_admin_privileges',
+            )
 
+class AdminProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = [
+            'username', 'first_name', 'last_name', 'email', 'address', 'phone_number',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        # Pop the current user if passed via kwargs.
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Optionally enforce that only staff or superusers can use this form.
+        if self.user and not self.user.is_staff and not self.user.is_superuser:
+            raise forms.ValidationError("You do not have permission to update the admin profile.")
+
+        # Optional: Add Tailwind or custom CSS classes to the fields
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400",
+            })
 
 # class ApprovalSimulationForm(forms.ModelForm):
  

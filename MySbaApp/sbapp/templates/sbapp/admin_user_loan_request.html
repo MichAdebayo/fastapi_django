@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Request List</title>
+  <style>
+      .loader {
+          border: 16px solid #f3f3f3;
+          border-top: 16px solid #3498db;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          animation: spin 2s linear infinite;
+          display: none;
+      }
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+  </style>
+</head>
+<body>
+    {% extends 'sbapp/base.html' %}
+    {% load static %}
+
+    {% block content %}
+    <div class="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <!-- Admin Welcome Section -->
+      <div class="mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ user.username }}</h1>
+          <p class="text-lg text-gray-600">Manage loan applications and determine their approval status.</p>
+      </div>
+
+      <!-- Loan Application Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <button onclick="filterLoans('Pending')" class="bg-blue-100 p-4 rounded-lg shadow-md text-left">
+              <h2 class="font-semibold text-xl">Pending Loans</h2>
+              <p class="text-2xl font-bold text-blue-600">{{ pending_loans_count }}</p>
+          </button>
+          <button onclick="filterLoans('Approved')" class="bg-green-100 p-4 rounded-lg shadow-md text-left">
+              <h2 class="font-semibold text-xl">Approved Loans</h2>
+              <p class="text-2xl font-bold text-green-600">{{ approved_loans_count }}</p>
+          </button>
+          <button onclick="filterLoans('Rejected')" class="bg-red-100 p-4 rounded-lg shadow-md text-left">
+              <h2 class="font-semibold text-xl">Rejected Loans</h2>
+              <p class="text-2xl font-bold text-red-600">{{ rejected_loans_count }}</p>
+          </button>
+      </div>
+
+      <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">Loan Request List</h1>
+
+      <div id="loader" class="loader"></div>
+
+      <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-gray-300 my-4">
+              <thead class="bg-[#3f3d88]">
+                  <tr>
+                      <th class="px-6 py-3 text-left text-sm font-semibold text-white">Loan ID</th>
+                      <th class="px-6 py-3 text-left text-sm font-semibold text-white">Requested Amount</th>
+                      <th class="px-6 py-3 text-left text-sm font-semibold text-white">Loan Simulation</th>
+                      <th class="px-6 py-3 text-left text-sm font-semibold text-white">Advisor Decision</th>
+                  </tr>
+              </thead>
+              <tbody id="loan-table-body" class="bg-white divide-y divide-gray-200">
+                  {% for loan in loan_applications %}
+                  <tr class="loan-row {{ loan.loan_status|lower }}" data-id="{{ loan.loan_nr_chk_dgt }}">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ loan.loan_nr_chk_dgt }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ loan.gr_appv }}</td>
+                      <td class="border border-gray-300 px-4 py-2">
+                          <div>
+                              <!-- Simulation status: will update from "Pending" to mapped result -->
+                              <span class="text-[#3f3d88]">{{ loan.custom_status }}</span>
+                          </div>
+                          {% if loan.simulation_view_state != "FINAL" %}
+                          <form id="simulate-form-{{ loan.loan_nr_chk_dgt }}" method="POST" action="{% url 'admin_user_loan_request' %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="predict_id" value="{{ loan.loan_nr_chk_dgt }}">
+                              <button type="submit" class="px-4 py-2 bg-[#3f3d88] text-white rounded hover:bg-[#e93710]">
+                                  Request Simulation
+                              </button>
+                          </form>
+                          {% endif %}
+                          <div>
+                              <span class="text-yellow-500">{{ loan.custom_simulation_date }}</span>
+                          </div>
+                      </td>
+                      <td class="border border-gray-300 px-4 py-2">
+                          <div>
+                              <!-- Advisor decision status -->
+                              <span class="text-yellow-500">{{ loan.custom_advisor_approval_status }}</span>
+                          </div>
+                          {% if loan.advisor_view_state != "FINAL" %}
+                          <div class="flex items-center space-x-2 mt-2">
+                              <form id="approve-form-{{ loan.loan_nr_chk_dgt }}" method="POST" action="{% url 'admin_user_loan_request' %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="update_id" value="{{ loan.loan_nr_chk_dgt }}">
+                                  <input type="hidden" name="status" value="Approved">
+                                  <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                                      Approve
+                                  </button>
+                              </form>
+                      
+                              <form id="reject-form-{{ loan.loan_nr_chk_dgt }}" method="POST" action="{% url 'admin_user_loan_request' %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="update_id" value="{{ loan.loan_nr_chk_dgt }}">
+                                  <input type="hidden" name="status" value="Rejected">
+                                  <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                      Reject
+                                  </button>
+                              </form>
+                          </div>
+                          {% endif %}
+                      
+                          <div class="mt-2">
+                              <span class="text-yellow-500">{{ loan.custom_advisor_approval_date }}</span>
+                          </div>
+                      </td>                        
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="5" class="text-center">No loan requests found.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Global counters from filter buttons.
+        let pendingCountElem = document.querySelector('button[onclick="filterLoans(\'Pending\')"] p');
+        let approvedCountElem = document.querySelector('button[onclick="filterLoans(\'Approved\')"] p');
+        let rejectedCountElem = document.querySelector('button[onclick="filterLoans(\'Rejected\')"] p');
+
+        // Attach a listener to every form on the page.
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                let formData = new FormData(form);
+                let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                let loanRow = form.closest('tr');
+                // Determine form type.
+                let isSimulation = formData.has('predict_id');
+                let isDecision = formData.has('status');
+
+                let url = form.action;
+                let method = form.method;
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success) {
+                        if(isSimulation) {
+                            // --- Simulation form handling ---
+                            let simulationTd = loanRow.querySelectorAll('td')[2];
+                            let simulationStatusSpan = simulationTd.querySelector('div:first-child span');
+                            // Use the returned approval_status from API response.
+                            let approval_status = data.approval_status || "";
+                            if(approval_status.toLowerCase() === "approve") {
+                                simulationStatusSpan.textContent = "Will be fully repaid";
+                            } else if(approval_status.toLowerCase() === "reject") {
+                                simulationStatusSpan.textContent = "Will default on payment";
+                            } else {
+                                simulationStatusSpan.textContent = "Pending";
+                            }
+                            // Do not hide the simulation button.
+                            // Ensure decision buttons (Approve/Reject) are visible.
+                            let decisionTd = loanRow.querySelectorAll('td')[3];
+                            let approveForm = decisionTd.querySelector('form input[name="status"][value="Approved"]')?.closest('form');
+                            let rejectForm = decisionTd.querySelector('form input[name="status"][value="Rejected"]')?.closest('form');
+                            if(approveForm) approveForm.style.display = "inline-block";
+                            if(rejectForm) rejectForm.style.display = "inline-block";
+                        } else if(isDecision) {
+                            // --- Decision form handling ---
+                            let decision = formData.get('status'); // "Approved" or "Rejected"
+                            // Update the global counters.
+                            let pending = parseInt(pendingCountElem.textContent);
+                            let approved = parseInt(approvedCountElem.textContent);
+                            let rejected = parseInt(rejectedCountElem.textContent);
+                            if(decision === "Approved") {
+                                approvedCountElem.textContent = approved + 1;
+                            } else if(decision === "Rejected") {
+                                rejectedCountElem.textContent = rejected + 1;
+                            }
+                            pendingCountElem.textContent = pending - 1;
+
+                            // In the decision cell (4th <td>), hide the non-selected form.
+                            let decisionTd = loanRow.querySelectorAll('td')[3];
+                            if(decision === "Approved") {
+                                let rejectForm = decisionTd.querySelector('form input[name="status"][value="Rejected"]')?.closest('form');
+                                if(rejectForm) {
+                                    rejectForm.style.display = "none";
+                                }
+                            } else if(decision === "Rejected") {
+                                let approveForm = decisionTd.querySelector('form input[name="status"][value="Approved"]')?.closest('form');
+                                if(approveForm) {
+                                    approveForm.style.display = "none";
+                                }
+                            }
+                            // Disable the clicked button.
+                            let clickedButton = form.querySelector('button');
+                            if(clickedButton) {
+                                clickedButton.disabled = true;
+                            }
+                        }
+                    } else {
+                        alert("An error occurred.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    alert("An error occurred.");
+                });
+            });
+        });
+    });
+    </script>
+    
+    {% endblock %}
+</body>
+</html>

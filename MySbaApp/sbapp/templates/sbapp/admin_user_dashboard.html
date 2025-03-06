@@ -1,0 +1,40 @@
+{% extends 'sbapp/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto py-6">
+  <h1 class="text-4xl font-bold mb-6">Admin Dashboard</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- View Loan Requests Card -->
+    <div class="p-6 bg-white rounded shadow text-center">
+      <i class="fa fa-dollar-sign text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+      <h3 class="text-xl font-semibold mb-2">View Loan Requests</h3>
+      <p class="text-gray-600 mb-4">View the history of all loan requests submitted by users.</p>
+      <a href="{% url 'admin_user_loan_request' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">
+        View Loan Requests
+      </a>
+    </div>
+
+    <!-- Update Profile Card -->
+    <div class="p-6 bg-white rounded shadow text-center">
+      <i class="fa fa-user text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+      <h3 class="text-xl font-semibold mb-2">Edit Profile Information</h3>
+      <p class="text-gray-600 mb-4">Update and save your personal and organizational details.</p>
+      <a href="{% url 'admin_user_profile' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">
+        Update Profile
+      </a>
+    </div>
+
+    {% comment %} <!-- (Optional) View Users Card -->
+    <div class="p-6 bg-white rounded shadow text-center">
+      <i class="fa fa-users text-4xl mb-4" style="color: #3f3d88;" aria-hidden="true"></i>
+      <h3 class="text-xl font-semibold mb-2">View Users</h3>
+      <p class="text-gray-600 mb-4">Manage users in the system.</p>
+      <a href="{% url '#' %}" class="block px-6 py-2 text-white rounded bg-[#3f3d88] hover:bg-[#e93710]">
+        View Users
+      </a>
+    </div> {% endcomment %}
+  </div>
+</div>
+{% endblock %}

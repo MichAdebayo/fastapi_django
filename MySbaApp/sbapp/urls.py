@@ -1,21 +1,37 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views 
-from .views import ( HomeView, SignupView, UserLoginView, UserWelcomeView, UserProfileView, 
+from .views import ( HomeView, SignupView, UserLoginView, UserDashboardView, UserProfileView, 
                     BusinessResourcesView, LoanRequestCreateView, LoanRequestSuccessView, WorkshopsView, LoanRequestStatusView,
-                    AboutView, ServicesView, BlogView, TestimonialView, ContactView, ContactSupportView) # solve_message,predict_charges,
+                    AboutView, ServicesView, BlogView, TestimonialView, ContactView, ContactSupportView, AdminLoginView,
+                    AdminDashboardView, AdminProfileView, AdminLoanRequestView, SimpleDataView, update_loan_status) # solve_message,predict_charges,AdminLoanRequestListView
                     # JoinUsView, ApplyView, TemplateView, apply,contact_view, contact_view_user,
-                    #,message_list_view, ChangePasswordView, 
-                    # PredictChargesView, UserLogoutView, PredictionHistoryView,book_appointment,get_available_times)
+                    #,message_list_view, ChangePasswordView, PredictChargesView, UserLogoutView, PredictionHistoryView,book_appointment,get_available_times)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('signup/', SignupView.as_view(), name='signup'),
-    path('login/', UserLoginView.as_view(), name='login'),
-    path('user-welcome/', UserWelcomeView.as_view(), name='user_welcome'),
-    path('update-profile/', UserProfileView.as_view(), name='user_profile'),
-    path('loan-request/', LoanRequestCreateView.as_view(), name='user_loan_request'),
+
+    # User
+    path('user/login/', UserLoginView.as_view(), name='user_login'),
+    path('user/dashboard/', UserDashboardView.as_view(), name='user_dashboard'),
+    path('update/profile/', UserProfileView.as_view(), name='user_profile'),
+    path('loan/request/', LoanRequestCreateView.as_view(), name='user_loan_request'),
     path('user/loan-status/',  LoanRequestStatusView.as_view(), name='user_loan_status'),
     path('user/loan-request/success/', LoanRequestSuccessView.as_view(), name='user_loan_request_success'),
+
+    # Admin
+    path('admin-user/login/', AdminLoginView.as_view(), name='admin_user_login'),
+    path('admin-user/dashboard/', AdminDashboardView.as_view(), name='admin_user_dashboard'),
+
+    path('simple-data/', SimpleDataView.as_view(), name='simple_data'),
+    path('admin-user/loan-requests/', AdminLoanRequestView.as_view(), name='admin_user_loan_request'),
+    path('admin-user/loan-requests/<str:loan_nr_chk_dgt>/predict/', AdminLoanRequestView.as_view(), name='predict_loan'),
+    path('admin-user/update-loan-status/', update_loan_status, name='update_user_loan_status'),
+
+
+    path('admin-user/profile/', AdminProfileView.as_view(), name='admin_user_profile'),
+
+    # Other pages
     path('business-resource/', BusinessResourcesView.as_view(), name='business_resources'),
     path('workshops/', WorkshopsView.as_view(), name='workshops'),
     path('about/', AboutView.as_view(), name='about'),
