@@ -10,8 +10,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 class UserProfile(AbstractUser):
 
     ### 🔹 Other Contact Information ###
-    address = models.CharField(max_length=255, blank=True, null=True)
-    phone_number = PhoneNumberField(blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, default='')
+    phone_number = PhoneNumberField(blank=True, default='')
 
     # Additional fields
     # date_of_birth = models.DateField(null=True, blank=True)
@@ -49,10 +49,10 @@ class LoanRequest(models.Model):
     loan_nr_chk_dgt = models.CharField(primary_key=True, max_length=10, unique=True, db_index=True)
 
     ### Enterprise Name
-    name = models.CharField(max_length=255, blank=True, help_text="Full Name of the Enterprise")
+    name = models.CharField(max_length=255, blank=True, null=True, default=None, help_text="Full Name of the Enterprise")
     
     ### 🔹 City where enterprise is located ###
-    city = models.CharField(max_length=255, blank=True, help_text="City where enterprise is located")
+    city = models.CharField(max_length=255, blank=True, default='', help_text="City where enterprise is located")
     
     ### 🔹 Number of Employees ###
     no_emp = models.PositiveSmallIntegerField(default=1, help_text="Number of employees")
@@ -60,6 +60,7 @@ class LoanRequest(models.Model):
     ### 🔹 Enterprise Franchise Code ###
     # Using a positive small integer to capture franchise code.
     franchise_code = models.PositiveSmallIntegerField(default=0, help_text="Enterprise Franchise Code")
+
 
     ### 🔹 Enterprise State ###
     class StateType(models.TextChoices):
@@ -117,7 +118,7 @@ class LoanRequest(models.Model):
     state = models.CharField(max_length=2, choices=StateType.choices)
 
     ### 🔹 City Zip Code ###
-    zip = models.CharField(max_length=5, blank=True, null=True) 
+    zip = models.CharField(max_length=5, blank=True, default='') 
 
     ### 🔹 Enterprise Bank ###
     bank = models.CharField(max_length=255, default="UB")
@@ -187,7 +188,7 @@ class LoanRequest(models.Model):
     class BusinessType(models.TextChoices):
         EXISTING_BUSINESS = '1.0', 'Existing Business'
         NEW_BUSINESS = '2.0', 'New Business'
-    new_exist = models.CharField(max_length=3, choices=BusinessType.choices, blank=True, default='0.0')
+    new_exist = models.CharField(max_length=3, choices=BusinessType.choices, blank=True, default='1.0', help_text="Type of Business")
 
     ### 🔹 Loan Term (Months) ###
     term = models.PositiveSmallIntegerField(default=1, help_text="Loan term in months")
@@ -196,7 +197,7 @@ class LoanRequest(models.Model):
     naics = models.CharField(max_length=6, blank=True, default="0", help_text="North American Industry Classification System Code")
 
     ### 🔹 Loan Approval Date (stored as DateField) ###
-    approval_date = models.DateField(null=True, blank=True, help_text="Date SBA commitment issued")
+    approval_date = models.DateField(blank=True, default=date(1900, 1, 1), help_text="Date SBA commitment issued")
     
     def get_approval_date_formatted(self):
         """Return ApprovalDate formatted as DD-MMM-YY (e.g., '28-Feb-89')"""
@@ -211,7 +212,7 @@ class LoanRequest(models.Model):
     approval_fy = models.CharField(
         max_length=4,
         choices=get_year_choices(),
-        null=True,
+        default= str(date(1900, 1, 1).year),
         blank=True,
         help_text="Fiscal Year of commitment"
     )
@@ -224,25 +225,25 @@ class LoanRequest(models.Model):
     class UrbanRuralType(models.TextChoices):
         URBAN = '1', 'Urban'
         RURAL = '2', 'Rural'
-    urban_rural = models.CharField(max_length=1, choices=UrbanRuralType.choices, blank=True, default='0')
+    urban_rural = models.CharField(max_length=1, choices=UrbanRuralType.choices, default='1', help_text="Urban or Rural Enterprise")
 
     ### 🔹 Loan Class (Revolving Line of Credit vs. Not) ###
     class RevLineCrType(models.TextChoices):
         YES = 'Y', 'Yes'
         NO = 'N', 'No'
-    rev_line_cr = models.CharField(max_length=1, choices=RevLineCrType.choices, blank=True, null=True, help_text="Revolving line of credit")
+    rev_line_cr = models.CharField(max_length=1, choices=RevLineCrType.choices, default='Y', help_text="Revolving line of credit")
 
     ### 🔹 Documentation Type (LowDoc vs. Heavy Doc) ###
     class LowDocType(models.TextChoices):
         YES = 'Y', 'Yes'
         NO = 'N', 'No'
-    low_doc = models.CharField(max_length=1, choices=LowDocType.choices, blank=True, null=True, help_text="LowDoc Loan Program")
+    low_doc = models.CharField(max_length=1, choices=LowDocType.choices, default='Y', help_text="LowDoc Loan Program")
 
     ### 🔹 Default Date (e.g., charged off date) ###
-    chg_off_date = models.DateField(null=True, blank=True, help_text="Date when loan is declared in default")
+    chg_off_date = models.DateField(blank=True, default=date(1900, 1, 1),help_text="Date when loan is declared in default")
 
     ### 🔹 Disbursement Date (stored as DateField) ###
-    disbursement_date = models.DateField(null=True, blank=True, help_text="Disbursement date")
+    disbursement_date = models.DateField(blank=True, null=True, help_text="Disbursement date")
     
     def get_disbursement_date_formatted(self):
         """Return DisbursementDate formatted as DD-MMM-YY"""
@@ -251,19 +252,19 @@ class LoanRequest(models.Model):
 
     ### 🔹 Currency Fields ###
     disbursement_gross = models.CharField(
-        max_length=20, null=True, blank=True, help_text="Amount disbursed"
+        max_length=20, default='', blank=True, help_text="Amount disbursed"
     )
     balance_gross = models.CharField(
-        max_length=20, null=True, blank=True, help_text="Gross amount outstanding"
+        max_length=20, default='', blank=True, help_text="Gross amount outstanding"
     )
     chg_off_prin_gr = models.CharField(
-        max_length=20, null=True, blank=True, help_text="Charged-off amount"
+        max_length=20, default='', blank=True, help_text="Charged-off amount"
     )
     gr_appv = models.CharField(
-        max_length=20, null=True, blank=True, help_text="Gross amount of loan approved by bank"
+        max_length=20, blank=True, default='', help_text="Gross amount of loan approved by bank"
     )
     sba_appv = models.CharField(
-        max_length=20, null=True, blank=True, help_text="SBA’s guaranteed amount of approved loan"
+        max_length=20, default='', blank=True, help_text="SBA’s guaranteed amount of approved loan"
     )
     loan_status = models.CharField(max_length=15, default='Pending')
 
@@ -415,6 +416,7 @@ class LoanRequest(models.Model):
 
         return api_data
         
+
 
     def __str__(self):
         return self.loan_nr_chk_dgt

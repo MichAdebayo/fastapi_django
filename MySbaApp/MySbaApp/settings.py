@@ -14,37 +14,28 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load the environmental variables of fichier .env
+# Load environment variables
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Security
+SECRET_KEY = os.getenv("SECRET_KEY", "default_secret_key")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "20.19.17.17, 0.0.0.0, 127.0.0.1, localhost").split(",") if os.getenv("ALLOWED_HOSTS") else []
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'default_secret_key')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-# Application definition
-
+# Installed Applications
 INSTALLED_APPS = [
-    # My Apps
-    'sbapp',
+    'sbapp',  # Your custom app
 
-    # Other Django Apps
+    # Third-party apps
     'phonenumber_field',
     'tailwind',
     'theme',
-    'django_browser_reload',
+    *(['django_browser_reload'] if DEBUG else []),
 
-    # Default Django
+    # Default Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,20 +44,37 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_browser_reload.middleware.BrowserReloadMiddleware',
+    # Only add browser reload middleware in debug mode
+    *(['django_browser_reload.middleware.BrowserReloadMiddleware'] if DEBUG else []),
 ]
 
+
+# Optional: enable compression and caching
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+if DEBUG:
+    WHITENOISE_AUTOREFRESH = True
+
+WHITENOISE_MANIFEST_STRICT = False # Make sure to set this to True in production
+
+# URL Configuration
 ROOT_URLCONF = 'MySbaApp.urls'
 
+# Authentication URLs
+LOGIN_URL = '/user/login/'
+
+
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -83,95 +91,75 @@ TEMPLATES = [
     },
 ]
 
+# WSGI Application
 WSGI_APPLICATION = 'MySbaApp.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# Database Configuration
+MSSQL_CONFIG = {
+    'ENGINE': os.getenv("MSSQL_ENGINE", "django.db.backends.sqlite3"),
+    'NAME': os.getenv("MSSQL_NAME", BASE_DIR / "db.sqlite3"),
+    'USER': os.getenv("MSSQL_USER", ""),
+    'PASSWORD': os.getenv("MSSQL_PASSWORD", ""),
+    'HOST': os.getenv("MSSQL_HOST", ""),
+    'PORT': int(os.getenv("MSSQL_PORT", 1433)), 
+    'OPTIONS': {
+        'driver': 'ODBC Driver 18 for SQL Server',
+        'Encrypt': 'yes',
+        'TrustServerCertificate': 'yes',
+        'Connection Timeout': 30,
+    } if os.getenv("MSSQL_ENGINE") else {}
 }
 
+DATABASES = {
+    'default': MSSQL_CONFIG
+}
 
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
+# Password Validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.BCryptPasswordHasher',  # Use bcrypt as the primary hasher
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # Fallback to PBKDF2 if needed
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    #'sbapp.hashers.CustomBCryptPasswordHasher',
     'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.ScryptPasswordHasher',
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-USE_L10N = False  # Important: Disables localization, ensuring DATE_FORMAT is used
+USE_L10N = False
 USE_I18N = True
-
 USE_TZ = True
-DATE_FORMAT = "d-M-y"  # Example: 28-Feb-98
+DATE_FORMAT = "d-M-y"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# Static and Media Files
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'sbapp/static',
+                    BASE_DIR / 'sbapp/static/images',]
 
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Ensure this points to your app's static folder:
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'sbapp/static')
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+# Authentication
 AUTH_USER_MODEL = 'sbapp.UserProfile'
 
-# AUTH_USER_MODEL = 'sbapp.LoanRequestUserProfile'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# Tailwind Theme
+# Tailwind
 TAILWIND_APP_NAME = 'theme'
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+# Internal IPs for debugging
+INTERNAL_IPS = ["127.0.0.1"]
 
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
+        'console': {'class': 'logging.StreamHandler'},
     },
     'root': {
         'handlers': ['console'],
@@ -183,7 +171,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'sbapp.views': {  # Replace 'sbapp.views' 
+        'sbapp.views': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
@@ -191,6 +179,3 @@ LOGGING = {
     },
 }
 
-
-# CSRF_COOKIE_SECURE = False  # Set to True in production
-# SESSION_COOKIE_SECURE = False  # Set to True in production

@@ -12,12 +12,12 @@ urlpatterns = [
     path('signup/', SignupView.as_view(), name='signup'),
 
     # User
-    path('user/login/', UserLoginView.as_view(), name='user_login'),
-    path('user/dashboard/', UserDashboardView.as_view(), name='user_dashboard'),
-    path('update/profile/', UserProfileView.as_view(), name='user_profile'),
-    path('loan/request/', LoanRequestCreateView.as_view(), name='user_loan_request'),
-    path('user/loan-status/',  LoanRequestStatusView.as_view(), name='user_loan_status'),
-    path('user/loan-request/success/', LoanRequestSuccessView.as_view(), name='user_loan_request_success'),
+    path('login/', UserLoginView.as_view(), name='user_login'),
+    path('user-dashboard/', UserDashboardView.as_view(), name='user_dashboard'),
+    path('update-profile/', UserProfileView.as_view(), name='user_profile'),
+    path('loan-request/', LoanRequestCreateView.as_view(), name='user_loan_request'),
+    path('user-loan-status/',  LoanRequestStatusView.as_view(), name='user_loan_status'),
+    path('user-loan-request-success/', LoanRequestSuccessView.as_view(), name='user_loan_request_success'),
 
     # Admin
     path('admin-user/login/', AdminLoginView.as_view(), name='admin_user_login'),
