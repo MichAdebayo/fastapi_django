@@ -1,5 +1,6 @@
-<!DOCTYPE html>
 {% load static %}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,13 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About Us</title>
   <!-- Correct static path for favicon -->
-  <link rel="icon" href="{% static 'images/fevicon.png' %}" type="image/gif" />
+  <link rel="icon" href="images/favicon.ico" type="image/gif" />
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/kTcTz+1rZ6t2nQmNX3gZvU4j3Bqhz4C4AXX76S4AOf3/P3BqC96OZ8fJzF+7u0Ju+F2pg+nY6T+0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet" />
 </head>
 <body class="bg-gray-50 font-roboto">
   <!-- Header Section -->
@@ -21,7 +18,7 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
       <a href="{% url 'home' %}">
         <!-- Correct static path for logo -->
-        <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-10" />
+        <img src="{% static 'images/testlogo.png' %}" alt="Logo" class="h-10" />
       </a>
       <nav class="hidden md:flex space-x-6">
         <a href="{% url 'home' %}" class="text-gray-700 hover:text-gray-900">Home</a>

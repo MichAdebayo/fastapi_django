@@ -180,7 +180,7 @@ class AdminLoginView(LoginView):
 
         # Authenticate with the FastAPI /auth/login endpoint
         try:
-            fastapi_url = "http://127.0.0.1:8000/auth/login"
+            fastapi_url = "http://20.19.17.17/auth/login"
             auth_data = {
                 "email": email,
                 "password": password,
@@ -378,7 +378,7 @@ def get_jwt_token(request):
         return request.session['jwt_token']
 
     response = requests.post(
-        'http://localhost:8000/auth/login',
+        'http://20.19.17.17/auth/login',
         json={'email': 'mike@test.com', 'password': 'obitochan'}
     )
     
@@ -486,7 +486,7 @@ class AdminLoanRequestView(LoginRequiredMixin, ListView):
         headers = {'Authorization': f'Bearer {token}'}
 
         if response := send_api_request(
-            'http://localhost:8000/loans/request',
+            'http://20.19.17.17/loans/request',
             'POST',
             data=api_data,
             headers=headers,
