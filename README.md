@@ -1,4 +1,4 @@
-# Django App for SBA Banking Loan Application 🚀
+# Django App for SBA Loan Application 🚀
 
 ![Banking App](https://i.imgur.com/FVRBQAT.png)
 
