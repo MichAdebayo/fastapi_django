@@ -1,6 +1,7 @@
 # FastAPI Django Banking Application 🚀
 
-![Banking App](https://imgur.com/3mNPh16)
+![Banking App](https://i.imgur.com/FVRBQAT.png)
+
 
 ## Overview
 
