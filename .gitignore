@@ -99,3 +99,10 @@ db.sqlite3
 
 # Ignore the collected static files folder
 /staticfiles/
+
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backupterraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
