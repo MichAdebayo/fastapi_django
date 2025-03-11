@@ -105,3 +105,9 @@ terraform/.terraform/
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backupterraform/.terraform/
 terraform/terraform.tfstate.backup
+
+# Env
+.env
+
+# Deploy shell
+deploy.sh
