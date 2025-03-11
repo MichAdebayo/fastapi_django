@@ -105,9 +105,13 @@ terraform/.terraform/
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backupterraform/.terraform/
 terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
 
 # Env
 .env
 
 # Deploy shell
 deploy.sh
+
+# Remove DS_Store
+.DS_Store
