@@ -1,11 +1,11 @@
-# FastAPI Django Banking Application 🚀
+# Django App for SBA Banking Loan Application 🚀
 
 ![Banking App](https://i.imgur.com/FVRBQAT.png)
 
 
 ## Overview
 
-This project is a comprehensive web application developed with Django for a modern banking system. It provides a platform for businesses to:
+This project is a comprehensive web application developed with Django to facilitate SBA Loan Request. It provides a platform for businesses to:
 - **Request Loans** via an intuitive form.
 - Access secure **Client & Advisor Portals**.
 - **Chat in Real-Time** with banking advisors.
