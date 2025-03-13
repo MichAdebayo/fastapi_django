@@ -105,6 +105,9 @@ terraform/.terraform/
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backupterraform/.terraform/
 terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+terraform.tfvars
+
 
 # Env
 .env
