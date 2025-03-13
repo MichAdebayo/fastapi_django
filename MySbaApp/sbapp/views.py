@@ -180,7 +180,7 @@ class AdminLoginView(LoginView):
 
         # Authenticate with the FastAPI /auth/login endpoint
         try:
-            fastapi_url = "http://http://ussba-fastapi.francecentral.azurecontainer.io/auth/login"
+            fastapi_url = "http://ussba-fastapi.francecentral.azurecontainer.io/auth/login"
             auth_data = {
                 "email": email,
                 "password": password,
@@ -378,7 +378,7 @@ def get_jwt_token(request):
         return request.session['jwt_token']
 
     response = requests.post(
-        'http://http://ussba-fastapi.francecentral.azurecontainer.io/auth/login',
+        'http://ussba-fastapi.francecentral.azurecontainer.io/auth/login',
         json={'email': 'mike@test.com', 'password': 'obitochan'}
     )
     
@@ -486,7 +486,7 @@ class AdminLoanRequestView(LoginRequiredMixin, ListView):
         headers = {'Authorization': f'Bearer {token}'}
 
         if response := send_api_request(
-            'http://http://ussba-fastapi.francecentral.azurecontainer.io/loans/request',
+            'http://ussba-fastapi.francecentral.azurecontainer.io/loans/request',
             'POST',
             data=api_data,
             headers=headers,
