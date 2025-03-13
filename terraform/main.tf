@@ -14,6 +14,7 @@ resource "azurerm_container_group" "madebayodjango" {
   location            = data.azurerm_resource_group.existing_rg.location
   resource_group_name = data.azurerm_resource_group.existing_rg.name
   os_type             = "Linux"
+  dns_name_label      = var.django_dns_label
 
   container {
     name   = "madebayodjango"
