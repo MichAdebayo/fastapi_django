@@ -110,6 +110,7 @@ terraform.tfvars
 
 
 # Env
+.env/
 .env
 
 # Deploy shell
