@@ -114,4 +114,5 @@ terraform.tfvars
 .env
 
 # Deploy shell
+deploy.sh/
 deploy.sh
