@@ -14,6 +14,11 @@ variable "django_container_name" {
   default     = "madebayodjango"
 }
 
+variable "django_dns_label" {
+  description = "DNS label for Django container"
+  type        = string
+}
+
 variable "django_image" {
   description = "Docker image for Django"
   type        = string
