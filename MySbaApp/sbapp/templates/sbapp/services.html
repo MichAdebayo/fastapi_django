@@ -1,0 +1,102 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-sans bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center py-4 px-6">
+            <a href="{% url 'home' %}" class="text-xl font-bold">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-10">
+            </a>
+            <button class="block lg:hidden text-gray-600 focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="hidden lg:flex space-x-6 text-gray-700">
+                <li><a href="{% url 'home' %}" class="hover:text-blue-500">Home</a></li>
+                <li><a href="{% url 'about' %}" class="hover:text-blue-500">About</a></li>
+                <li><a href="{% url 'services' %}" class="hover:text-blue-500">Services</a></li>
+                <li><a href="{% url 'blog' %}" class="hover:text-blue-500">Blog</a></li>
+                <li><a href="{% url 'testimonial' %}" class="hover:text-blue-500">Testimonial</a></li>
+                <li><a href="{% url 'contact' %}" class="hover:text-blue-500">Contact Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Services Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl font-bold text-gray-800">What We Do</h1>
+            <p class="text-gray-600 mt-4">Content here, content here, making it look like readable English.</p>
+        </div>
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
+            <div class="bg-blue-100 p-6 rounded-lg text-center">
+                <img src="{% static 'images/phone-icon.png' %}" alt="" class="mx-auto mb-4">
+                <h3 class="text-xl font-semibold">Social Marketing</h3>
+                <p class="text-gray-600 mt-2">Passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing.</p>
+                <a href="#" class="text-blue-500 mt-4 block">Read More</a>
+            </div>
+            <div class="bg-blue-100 p-6 rounded-lg text-center">
+                <img src="{% static 'images/contant-icon.png' %}" alt="" class="mx-auto mb-4">
+                <h3 class="text-xl font-semibold">Content Marketing</h3>
+                <p class="text-gray-600 mt-2">Passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing.</p>
+                <a href="#" class="text-blue-500 mt-4 block">Read More</a>
+            </div>
+            <div class="bg-blue-100 p-6 rounded-lg text-center">
+                <img src="{% static 'images/data-icon.png' %}" alt="" class="mx-auto mb-4">
+                <h3 class="text-xl font-semibold">Data Analysis</h3>
+                <p class="text-gray-600 mt-2">Passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing.</p>
+                <a href="#" class="text-blue-500 mt-4 block">Read More</a>
+            </div>
+            <div class="bg-blue-100 p-6 rounded-lg text-center">
+                <img src="{% static 'images/promotion-icon.png' %}" alt="" class="mx-auto mb-4">
+                <h3 class="text-xl font-semibold">Promotion</h3>
+                <p class="text-gray-600 mt-2">Passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing.</p>
+                <a href="#" class="text-blue-500 mt-4 block">Read More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-10">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold">Contact Us</h3>
+                <p class="mt-4">Call: +01 1234567890</p>
+                <p>Email: demo@gmail.com</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold">Quick Links</h3>
+                <ul class="mt-4 space-y-2">
+                    <li><a href="{% url 'home' %}" class="hover:text-blue-400">Home</a></li>
+                    <li><a href="{% url 'about' %}" class="hover:text-blue-400">About</a></li>
+                    <li><a href="{% url 'services' %}" class="hover:text-blue-400">Services</a></li>
+                    <li><a href="{% url 'testimonial' %}" class="hover:text-blue-400">Testimonial</a></li>
+                    <li><a href="{% url 'blog' %}" class="hover:text-blue-400">Blog</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-blue-400">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold">Info</h3>
+                <p class="mt-4">Making this the first true generator on the Internet.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold">Subscribe</h3>
+                <input type="email" placeholder="Your Email" class="w-full p-2 mt-4 rounded-lg text-black">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white mt-4 p-2 rounded-lg w-full">Subscribe</button>
+            </div>
+        </div>
+        <div class="text-center mt-10">
+            <p>&copy; 2025 All Rights Reserved. Design by <a href="https://html.design" class="text-blue-400">Free Html Templates</a></p>
+        </div>
+    </footer>
+</body>
+</html>

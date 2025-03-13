@@ -1,0 +1,18 @@
+{% extends "sbapp/base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10 text-center">
+    <h1 class="text-2xl font-semibold text-[#3f3d88]">Loan Request Submitted Successfully!</h1>
+    <p class="mt-4 text-gray-700">Your loan request has been submitted and is being processed.</p>
+
+    <div class="mt-6 space-y-4">
+        <a href="{% url 'user_loan_status' %}" class="block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">
+            Check Loan Status
+        </a>
+
+        <a href="{% url 'user_dashboard' %}" class="block bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg">
+            Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'sbapp/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Workshops</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <p class="mb-4">Explore our upcoming workshops designed to help you grow your business.</p>
+        
+        <div class="space-y-4">
+            {% for workshop in workshops %}
+                <div class="border-b border-gray-200 pb-4">
+                    <h2 class="text-2xl font-semibold">{{ workshop.title }}</h2>
+                    <p class="text-gray-600 mb-2"><strong>Date:</strong> {{ workshop.date }}</p>
+                    <p class="text-gray-600 mb-2"><strong>Location:</strong> {{ workshop.location }}</p>
+                    <p class="text-gray-600">{{ workshop.description }}</p>
+                </div>
+            {% empty %}
+                <p>No upcoming workshops available at the moment. Please check back later.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

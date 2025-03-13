@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Blog</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   </head>
+   <body class="bg-gray-100 text-gray-900">
+      <header class="bg-white shadow-md">
+         <div class="container mx-auto p-4 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-xl font-bold"><img src="{% static 'images/logo.png' %}" alt="Logo"></a>
+            <nav>
+               <ul class="flex space-x-6">
+                  <li><a href="{% url 'home' %}" class="hover:text-blue-600">Home</a></li>
+                  <li><a href="{% url 'about' %}" class="hover:text-blue-600">About</a></li>
+                  <li><a href="{% url 'services' %}" class="hover:text-blue-600">Services</a></li>
+                  <li><a href="{% url 'blog' %}" class="hover:text-blue-600">Blog</a></li>
+                  <li><a href="{% url 'testimonial' %}" class="hover:text-blue-600">Testimonial</a></li>
+                  <li><a href="{% url 'contact' %}" class="hover:text-blue-600">Contact Us</a></li>
+               </ul>
+            </nav>
+         </div>
+      </header>
+      <main class="container mx-auto py-12 px-6">
+         <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+               <h1 class="text-4xl font-bold">See our work</h1>
+               <p class="mt-4 text-gray-600">Eusing 'Content here, content here', making it look like readable English...</p>
+               <a href="#" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg">See More Video</a>
+            </div>
+            <div class="flex justify-center">
+               <img src="{% static 'images/play-icon.png' %}" alt="Play Icon" class="w-20 h-20">
+            </div>
+         </div>
+      </main>
+      <footer class="bg-gray-800 text-white py-12">
+         <div class="container mx-auto grid md:grid-cols-3 gap-8 px-6">
+            <div>
+               <h3 class="text-lg font-semibold">Contact Us</h3>
+               <ul class="mt-4 space-y-2">
+                  <li><i class="fa fa-map-marker"></i> Making this the first true</li>
+                  <li><i class="fa fa-phone"></i> Call: +01 1234567890</li>
+                  <li><i class="fa fa-envelope"></i> Email: demo@gmail.com</li>
+               </ul>
+            </div>
+            <div>
+               <h3 class="text-lg font-semibold">Quick Links</h3>
+               <ul class="mt-4 space-y-2">
+                  <li><a href="{% url 'home' %}" class="hover:text-gray-400">Home</a></li>
+                  <li><a href="{% url 'about' %}" class="hover:text-gray-400">About</a></li>
+                  <li><a href="{% url 'services' %}" class="hover:text-gray-400">Services</a></li>
+                  <li><a href="{% url 'blog' %}" class="hover:text-gray-400">Latest News</a></li>
+                  <li><a href="{% url 'contact' %}" class="hover:text-gray-400">Contact Us</a></li>
+               </ul>
+            </div>
+            <div>
+               <h3 class="text-lg font-semibold">Subscribe</h3>
+               <input type="email" placeholder="Your Email" class="w-full px-4 py-2 mt-4 rounded-lg text-gray-900">
+               <button class="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg">Subscribe</button>
+            </div>
+         </div>
+         <div class="text-center text-gray-500 mt-8">2020 All Rights Reserved.</div>
+      </footer>
+   </body>
+</html>

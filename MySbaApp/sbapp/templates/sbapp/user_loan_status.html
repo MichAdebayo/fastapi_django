@@ -1,0 +1,43 @@
+{% extends 'sbapp/base.html' %}
+
+{% block content %}
+<div class="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg space-y-4">
+    <h2 class="text-2xl font-semibold text-center">Loan Request Status</h2>
+
+    <div class="space-y-4">
+        <!-- Success Message -->
+        <div class="flex flex-col">
+            <p class="text-lg text-[#e93710] font-semibold">
+                Your loan request has been successfully submitted!
+            </p>
+        </div>
+
+        <!-- Loan Request Details -->
+        <div class="flex flex-col space-y-2">
+            <p class="text-lg text-gray-800">
+                Loan Request Number: <strong>#{{ loanNr_chkDgt }}</strong>
+            </p>
+            <p class="text-lg text-gray-800">
+                Amount Requested: <strong>${{ gr_appv}}</strong>
+            </p>
+            <p class="text-lg text-gray-700">
+                Status: <strong class="text-yellow-500">{{ loan_status }}</strong>
+            </p>
+        </div>
+
+        <!-- Option to check status again -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'user_loan_status' %}" class="text-[#3f3d88] hover:text-[#e93710]">
+                Check Loan Status Again
+            </a>
+        </div>
+
+        <!-- Option to go back to home -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'user_welcome' %}" class="text-[#3f3d88] hover:text-[#e93710]">
+                Go Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
