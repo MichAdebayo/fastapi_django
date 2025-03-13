@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 def sync_admin_user_to_fastapi(user):
-    fastapi_url = "http://20.19.17.17/sync/users"
+    fastapi_url = "http://ussba-fastapi.francecentral.azurecontainer.io/sync/users"
     user_data = {
         "email": user.email,
         "username": user.username,
