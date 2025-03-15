@@ -28,7 +28,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 
 
-
+from MySbaApp.settings import PREDICTION_SERVICE_URL
 
 
 class HomeView(TemplateView):
@@ -180,7 +180,7 @@ class AdminLoginView(LoginView):
 
         # Authenticate with the FastAPI /auth/login endpoint
         try:
-            fastapi_url = "http://20.19.17.17/auth/login"
+            fastapi_url = f"{PREDICTION_SERVICE_URL}/auth/login"
             auth_data = {
                 "email": email,
                 "password": password,
@@ -306,7 +306,7 @@ class SimpleDataView(View):
         """
         try:
             # Define the FastAPI login endpoint URL
-            fastapi_login_url = "http://127.0.0.1:8000/auth/login"
+            fastapi_login_url = f"{PREDICTION_SERVICE_URL}/auth/login"
             
             # Replace these with actual credentials or retrieve them from a secure source
             credentials = {
@@ -338,7 +338,7 @@ class SimpleDataView(View):
                     return None
                 
                 # Define the FastAPI prediction endpoint URL
-                fastapi_prediction_url = "http://127.0.0.1:8000/loans/request"
+                fastapi_prediction_url = f"{PREDICTION_SERVICE_URL}/loans/request"
                 
                 headers = {
                     "Authorization": f"Bearer {token}",
@@ -378,7 +378,7 @@ def get_jwt_token(request):
         return request.session['jwt_token']
 
     response = requests.post(
-        'http://20.19.17.17/auth/login',
+        f"{PREDICTION_SERVICE_URL}/auth/login",
         json={'email': 'mike@test.com', 'password': 'obitochan'}
     )
     
@@ -486,7 +486,7 @@ class AdminLoanRequestView(LoginRequiredMixin, ListView):
         headers = {'Authorization': f'Bearer {token}'}
 
         if response := send_api_request(
-            'http://20.19.17.17/loans/request',
+            f"{PREDICTION_SERVICE_URL}/loans/request",
             'POST',
             data=api_data,
             headers=headers,

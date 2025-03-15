@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "⏳ Waiting for database to be ready..."
-/wait-for-it.sh madebayosqlserver.database.windows.net:1433 -t 60 -- echo "✅ Database is ready!"
+/wait-for-it.sh ncassonnetsqlserver.database.windows.net:1433 -t 60 -- echo "✅ Database is ready!"
 
 echo "🚀 Running migrations..."
 python manage.py migrate || { echo "❌ Migrations failed. Retrying..."; sleep 5; python manage.py migrate; }

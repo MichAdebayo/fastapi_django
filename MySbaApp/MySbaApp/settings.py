@@ -25,6 +25,8 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "20.19.17.17, 0.0.0.0, 127.0.0.1, localhost").split(",") if os.getenv("ALLOWED_HOSTS") else []
 
+PREDICTION_SERVICE_URL = "http://nicocasso-prediction-service.francecentral.azurecontainer.io:3100"
+
 # Installed Applications
 INSTALLED_APPS = [
     'sbapp',  # Your custom app
