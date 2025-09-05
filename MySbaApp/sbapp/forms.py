@@ -8,8 +8,9 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 
-class UserSignupForm(forms.ModelForm):
 
+class UserSignupForm(forms.ModelForm):
+    """Form for user signup, including username, email, and password fields."""
     password = forms.CharField(
         widget=forms.PasswordInput, label="Password"
     )  # Password field with hidden input
@@ -23,6 +24,9 @@ class UserSignupForm(forms.ModelForm):
 
 
     def save(self, commit=True):
+        """
+        Save the user profile after hashing the password.
+        """
         user = super().save(
             commit=False
         )  # Create a user object without saving it to the database yet
@@ -35,6 +39,7 @@ class UserSignupForm(forms.ModelForm):
         return user
 
 class UserLoginForm(forms.Form):
+    """Form for user login, including username and password fields."""
 
     username = forms.CharField(
         max_length=150, label="Username"
@@ -45,6 +50,7 @@ class UserLoginForm(forms.Form):
 
 
 class UserProfileForm(forms.ModelForm):
+    """Form for updating user profile information."""
 
     class Meta:
         model = UserProfile
@@ -53,6 +59,8 @@ class UserProfileForm(forms.ModelForm):
         ]
 
 class LoanRequestForm(forms.ModelForm):
+    """Form for submitting loan requests."""
+
     class Meta:
         model = LoanRequest
         fields = [
@@ -62,6 +70,8 @@ class LoanRequestForm(forms.ModelForm):
             ]
 
 class AdminAuthenticationForm(AuthenticationForm):
+    """Form for admin authentication, including username and password fields."""
+
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
         if not user.is_staff and not user.is_superuser:
@@ -71,6 +81,7 @@ class AdminAuthenticationForm(AuthenticationForm):
             )
 
 class AdminProfileForm(forms.ModelForm):
+    """Form for updating admin profile information."""
     class Meta:
         model = UserProfile
         fields = [

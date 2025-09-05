@@ -7,8 +7,9 @@ from django.conf import settings
 import random
 from phonenumber_field.modelfields import PhoneNumberField
 
-class UserProfile(AbstractUser):
 
+class UserProfile(AbstractUser):
+    """Custom user model extending AbstractUser with additional fields."""
     ### 🔹 Other Contact Information ###
     address = models.CharField(max_length=255, blank=True, default='')
     phone_number = PhoneNumberField(blank=True, default='')
@@ -64,6 +65,7 @@ class LoanRequest(models.Model):
 
     ### 🔹 Enterprise State ###
     class StateType(models.TextChoices):
+        """Enterprise State"""
         AL = 'AL', 'Alabama'
         AK = 'AK', 'Alaska'
         AZ = 'AZ', 'Arizona'
@@ -125,6 +127,7 @@ class LoanRequest(models.Model):
 
     ### 🔹 Bank State ###
     class BankStateType(models.TextChoices):
+        """Bank State (e.g., where the bank is located)"""
         AL = 'AL', 'Alabama'
         AK = 'AK', 'Alaska'
         AZ = 'AZ', 'Arizona'
@@ -186,6 +189,7 @@ class LoanRequest(models.Model):
     ### 🔹 Type of Business (New vs Existing) ###
     # Improved with more intuitive codes.
     class BusinessType(models.TextChoices):
+        """Type of Business (New vs Existing)"""
         EXISTING_BUSINESS = '1.0', 'Existing Business'
         NEW_BUSINESS = '2.0', 'New Business'
     new_exist = models.CharField(max_length=3, choices=BusinessType.choices, blank=True, default='1.0', help_text="Type of Business")
@@ -223,18 +227,21 @@ class LoanRequest(models.Model):
 
     ### 🔹 Enterprise Class Type (Urban/Rural) ###
     class UrbanRuralType(models.TextChoices):
+        """Enterprise Class Type (Urban/Rural)"""
         URBAN = '1', 'Urban'
         RURAL = '2', 'Rural'
     urban_rural = models.CharField(max_length=1, choices=UrbanRuralType.choices, default='1', help_text="Urban or Rural Enterprise")
 
     ### 🔹 Loan Class (Revolving Line of Credit vs. Not) ###
     class RevLineCrType(models.TextChoices):
+        """Revolving Line of Credit Type"""
         YES = 'Y', 'Yes'
         NO = 'N', 'No'
     rev_line_cr = models.CharField(max_length=1, choices=RevLineCrType.choices, default='Y', help_text="Revolving line of credit")
 
     ### 🔹 Documentation Type (LowDoc vs. Heavy Doc) ###
     class LowDocType(models.TextChoices):
+        """Documentation Type (LowDoc vs. Heavy Doc)"""
         YES = 'Y', 'Yes'
         NO = 'N', 'No'
     low_doc = models.CharField(max_length=1, choices=LowDocType.choices, default='Y', help_text="LowDoc Loan Program")
@@ -330,6 +337,7 @@ class LoanRequest(models.Model):
 
     ### Overridden Save Method ###
     def save(self, *args, **kwargs):
+        """Custom save method to handle data formatting and defaults."""
         # Auto-generate LoanNr_ChkDgt if not provided.
         if not self.loan_nr_chk_dgt:
             loan_suffix = str(random.randint(100000, 999999))
@@ -374,6 +382,7 @@ class LoanRequest(models.Model):
         """
         # Helper function to convert RevLineCr and LowDoc to integer (1 for 'Y', 0 for 'N' or None)
         def convert_yes_no_to_int(value):
+            """Convert RevLineCr and LowDoc to integer (1 for 'Y', 0 for 'N' or None)"""
             if value == "Y":
                 return 1
             elif value == "N" or value is None:
@@ -382,6 +391,7 @@ class LoanRequest(models.Model):
 
         # Helper function to convert UrbanRural to integer (1 for Urban, 2 for Rural, 0 for default/invalid)
         def convert_urban_rural_to_int(value):
+            """Convert UrbanRural to integer (1 for Urban, 2 for Rural, 0 for default/invalid)"""
             if value == "1":
                 return 1
             elif value == "2":
@@ -389,11 +399,14 @@ class LoanRequest(models.Model):
             return 0
 
         def convert_naics_to_int(value):
+            """Convert NAICS code to integer by taking the first two digits.
+            Assumes NAICS is a string of digits."""
             if value.isdigit():
                 return int(str(value)[:2])  # Convert to string, slice, then back to int
             raise ValueError("Invalid NAICS code: must be a numeric string")  # Handle invalid input
 
         def new_exists_to_int(value):
+            """Convert NewExist to integer (1 for Existing, 2 for New, 0 for default/invalid)"""
             return int(float(value)) if value and str(value).replace('.','',1).isdigit() else 0
 
         # Construct the API data dictionary
